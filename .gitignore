@@ -40,3 +40,4 @@ out/
 ### Security ###
 application.yml
 .env
+src/main/generated

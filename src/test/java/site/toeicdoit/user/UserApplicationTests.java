@@ -1,4 +1,4 @@
-package com.toeicdoit.user;
+package site.toeicdoit.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
