@@ -6,9 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.toeicdoit.article.domain.ArticleDto;
 import site.toeicdoit.article.service.ArticleService;
-import site.toeicdoit.common.service.Messenger;
+import site.toeicdoit.common.domain.Messenger;
 
-import java.util.List;
 import java.util.Optional;
 
 @Log4j2

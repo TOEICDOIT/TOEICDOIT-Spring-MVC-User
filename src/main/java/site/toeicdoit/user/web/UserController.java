@@ -7,7 +7,7 @@ import site.toeicdoit.user.service.UserService;
 @RequiredArgsConstructor
 @RestController
 public class UserController {
-//    private final UserService userService;
+    private final UserService userService;
 
 
 }

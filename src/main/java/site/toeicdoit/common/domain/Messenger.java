@@ -1,4 +1,4 @@
-package site.toeicdoit.common.service;
+package site.toeicdoit.common.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

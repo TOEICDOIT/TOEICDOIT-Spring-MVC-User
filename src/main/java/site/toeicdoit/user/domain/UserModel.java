@@ -7,10 +7,12 @@ import site.toeicdoit.article.domain.ArticleModel;
 import java.util.List;
 
 @Entity(name = "users")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+//        (access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString(exclude = "id")
 public class UserModel {
 

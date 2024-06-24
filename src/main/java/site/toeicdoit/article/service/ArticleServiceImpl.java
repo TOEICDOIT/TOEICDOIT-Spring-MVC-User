@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import site.toeicdoit.article.domain.ArticleDto;
 import site.toeicdoit.article.domain.ArticleModel;
 import site.toeicdoit.article.repository.ArticleRepository;
-import site.toeicdoit.article.repository.CustomArticleRepository;
-import site.toeicdoit.common.service.Messenger;
+import site.toeicdoit.common.domain.Messenger;
 
 import java.util.List;
 import java.util.Optional;
