@@ -1,7 +1,7 @@
 package site.toeicdoit.user.repository;
 
 import org.springframework.stereotype.Repository;
-import site.toeicdoit.user.domain.UserModel;
+import site.toeicdoit.user.domain.model.UserModel;
 
 import java.util.*;
 
