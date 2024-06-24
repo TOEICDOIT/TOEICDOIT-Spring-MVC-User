@@ -1,24 +1,24 @@
 package site.toeicdoit.user.domain.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Data
 @Builder
-public class ArticleDto {
+public class BoardDto {
     private Long id;
     private String title;
     private String content;
-    private String writer;
     private String type;
-    private String answer;
-    private String createDate;
-    private String updateDate;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

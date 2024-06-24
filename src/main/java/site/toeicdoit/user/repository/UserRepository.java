@@ -1,14 +1,11 @@
 package site.toeicdoit.user.repository;
 
+import org.springframework.data.repository.CrudRepository;
 import site.toeicdoit.user.domain.model.UserModel;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository {
+public interface UserRepository extends CrudRepository<UserModel, Long>, CustomUserRepository {
 
-    UserModel save(UserModel user);
-    Optional<UserModel> findByUsername(String username);
-    Optional<UserModel> findById(Long id);
-    List<UserModel> findAll();
 }

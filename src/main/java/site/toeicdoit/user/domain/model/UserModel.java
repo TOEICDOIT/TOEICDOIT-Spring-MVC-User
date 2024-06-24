@@ -2,33 +2,32 @@ package site.toeicdoit.user.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import site.toeicdoit.user.domain.BaseEntity;
 
 import java.util.List;
 
 @Entity(name = "users")
-@NoArgsConstructor
-//        (access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Getter
-@Setter
-@ToString(exclude = "id")
-public class UserModel {
+@ToString(exclude = {"id"})
+public class UserModel extends BaseEntity {
 
     @Id
     @Column(name ="id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String email;
     private String password;
+    private String profile;
     private String name;
-    private String phone;
     private String nickName;
+    private String phone;
 
-    private String createDate;
-    private String updateDate;
+//    private List<Role> role;
 
 
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ArticleModel> articles;
+    private List<BoardModel> boardModels;
 }

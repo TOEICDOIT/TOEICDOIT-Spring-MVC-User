@@ -3,6 +3,8 @@ package site.toeicdoit.user.domain.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,7 +14,14 @@ import lombok.*;
 public class UserDto {
 
     private Long id;
-    private String username;
+    private String email;
     private String password;
+    private String profile;
+    private String name;
+    private String nickName;
+    private String phone;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

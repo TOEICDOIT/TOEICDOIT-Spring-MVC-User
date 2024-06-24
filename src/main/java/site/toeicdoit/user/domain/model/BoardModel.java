@@ -2,14 +2,15 @@ package site.toeicdoit.user.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import site.toeicdoit.user.domain.BaseEntity;
 
-@Entity(name = "articles")
+@Entity(name = "boards")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Getter
-@ToString(exclude = "id")
-public class ArticleModel {
+@ToString(exclude = {"id"})
+public class BoardModel extends BaseEntity {
 
     @Id
     @Column(name ="id", nullable = false)
@@ -17,13 +18,7 @@ public class ArticleModel {
     private Long id;
     private String title;
     private String content;
-    private String writer;
     private String type;
-    private String answer;
-    private String createDate;
-    private String updateDate;
-
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

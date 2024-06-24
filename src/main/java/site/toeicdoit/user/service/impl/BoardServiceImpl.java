@@ -4,30 +4,30 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import site.toeicdoit.user.domain.dto.ArticleDto;
-import site.toeicdoit.user.domain.model.ArticleModel;
-import site.toeicdoit.user.repository.ArticleRepository;
+import site.toeicdoit.user.domain.dto.BoardDto;
+import site.toeicdoit.user.domain.model.BoardModel;
+import site.toeicdoit.user.repository.BoardRepository;
 import site.toeicdoit.user.domain.Messenger;
-import site.toeicdoit.user.service.ArticleService;
+import site.toeicdoit.user.service.BoardService;
 
 import java.util.List;
 import java.util.Optional;
 
-@Log4j2
 @Service
+@Log4j2
 @RequiredArgsConstructor
-public class ArticleServiceImpl implements ArticleService {
+public class BoardServiceImpl implements BoardService {
 
-    private final ArticleRepository repository;
+    private final BoardRepository repository;
 
     @Transactional
     @Override
-    public Messenger save(ArticleDto dto) {
-        log.info("ArticleModel save Impl: {}", dto);
-        ArticleModel result = repository.save(dtoToEntity(dto));
-        System.out.println((result instanceof ArticleModel) ? "SUCCESS" : "FAILURE");
+    public Messenger save(BoardDto dto) {
+        log.info("BoardModel save Impl: {}", dto);
+        BoardModel result = repository.save(dtoToEntity(dto));
+        System.out.println((result instanceof BoardModel) ? "SUCCESS" : "FAILURE");
         return Messenger.builder()
-                .message((result instanceof ArticleModel) ? "SUCCESS" : "FAILURE")
+                .message((result instanceof BoardModel) ? "SUCCESS" : "FAILURE")
                 .build();
     }
 
@@ -46,27 +46,27 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Transactional
     @Override
-    public Messenger modify(ArticleDto dto) {
-        log.info("ArticleModel modify Impl: {}", dto);
-        ArticleModel ent = dtoToEntity(dto);
+    public Messenger modify(BoardDto dto) {
+        log.info("BoardModel modify Impl: {}", dto);
+        BoardModel ent = dtoToEntity(dto);
         Long id = dto.getId();
         String title = dto.getTitle();
         String content = dto.getContent();
 
-        System.out.println((ent instanceof ArticleModel) ? "SUCCESS" : "FAILURE");
+        System.out.println((ent instanceof BoardModel) ? "SUCCESS" : "FAILURE");
         return Messenger.builder()
-                .message((ent instanceof ArticleModel) ? "SUCCESS" : "FAILURE")
+                .message((ent instanceof BoardModel) ? "SUCCESS" : "FAILURE")
                 .build();
     }
 
     @Override
-    public List<ArticleDto> findAll() {
+    public List<BoardDto> findAll() {
         return repository.findAll().stream().map(i -> entityToDto(i)).toList();
     }
 
     @Override
-    public Optional<ArticleDto> findById(Long id) {
-        log.info("ArticleModel findById Impl: {}", id);
+    public Optional<BoardDto> findById(Long id) {
+        log.info("BoardModel findById Impl: {}", id);
         return repository.findById(id).map(i -> entityToDto(i));
     }
 
