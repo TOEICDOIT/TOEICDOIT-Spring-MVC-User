@@ -19,9 +19,4 @@ public class ReplyModel extends BaseEntity {
     private Long id;
     private String content;
 
-//    private ReplyModel reply;
-
-//    @OneToOne
-//    user & board 연관관계 설정 예정
-
 }

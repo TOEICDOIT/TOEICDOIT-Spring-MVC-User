@@ -21,7 +21,7 @@ public class UserDto {
     private String nickName;
     private String phone;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
 
 }

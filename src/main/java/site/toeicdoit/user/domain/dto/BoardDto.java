@@ -19,6 +19,6 @@ public class BoardDto {
     private String content;
     private String type;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
 }
