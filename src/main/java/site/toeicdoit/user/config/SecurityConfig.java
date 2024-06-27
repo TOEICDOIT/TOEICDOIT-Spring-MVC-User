@@ -1,6 +1,9 @@
 package site.toeicdoit.user.config;
 
 import lombok.RequiredArgsConstructor;
+import site.toeicdoit.user.handler.OAuth2SuccessHandler;
+import site.toeicdoit.user.service.impl.CustomOAuth2UserServiceImpl;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
 
-    private final CustomOAuth2UserService oAuth2UserService;
+    private final CustomOAuth2UserServiceImpl oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
 

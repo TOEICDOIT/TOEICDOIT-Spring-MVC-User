@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import site.toeicdoit.user.domain.Messenger;
-import site.toeicdoit.user.domain.PageRequestVo;
+
 import site.toeicdoit.user.domain.dto.UserDto;
+import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.PageRequestVo;
 import site.toeicdoit.user.service.UserService;
 
 import java.util.List;

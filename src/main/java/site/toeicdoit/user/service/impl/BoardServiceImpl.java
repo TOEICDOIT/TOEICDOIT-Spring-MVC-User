@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import site.toeicdoit.user.domain.dto.BoardDto;
-import site.toeicdoit.user.domain.model.BoardModel;
-import site.toeicdoit.user.repository.BoardRepository;
-import site.toeicdoit.user.domain.Messenger;
+import site.toeicdoit.user.domain.model.jpa.BoardModel;
+import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.repository.jpa.BoardRepository;
 import site.toeicdoit.user.service.BoardService;
 
 import java.util.List;
