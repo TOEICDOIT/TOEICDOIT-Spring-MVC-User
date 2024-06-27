@@ -11,6 +11,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "Hello User World! 안녕 유저 월드^^ "+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분"));
+        return "Hello User World!"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분"));
     }
 }

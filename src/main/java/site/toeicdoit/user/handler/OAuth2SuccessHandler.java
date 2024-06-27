@@ -10,10 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import site.toeicdoit.user.domain.model.oauth2.PrincipalDetails;
-import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.MessengerVo;
 import site.toeicdoit.user.service.impl.JwtTokenProvider;
 
 import java.io.IOException;
@@ -44,13 +43,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // 토큰 전달을 위한 redirect
 //        String redirectUrl = UriComponentsBuilder.fromUriString(URI)
-//                .buildAndExpand(Messenger.builder()
+//                .buildAndExpand(MessengerVo.builder()
 //                        .message("Success")
 //                        .accessToken(accessToken)
 //                        .refreshToken(refreshToken)
 //                        .build()).toUriString();
 
-        String result = objectMapper.writeValueAsString(Messenger.builder()
+        String result = objectMapper.writeValueAsString(MessengerVo.builder()
                 .message("Success")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

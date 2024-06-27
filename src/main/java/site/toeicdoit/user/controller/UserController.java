@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import site.toeicdoit.user.domain.dto.UserDto;
-import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.MessengerVo;
 import site.toeicdoit.user.domain.vo.PageRequestVo;
 import site.toeicdoit.user.service.UserService;
 
@@ -33,13 +33,13 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    @PutMapping("/modify")
-    public ResponseEntity<Messenger> modify(@RequestBody UserDto param) {
-        return ResponseEntity.ok(userService.modify(param));
-    }
+//    @PutMapping("/modify")
+//    public ResponseEntity<MessengerVo> modify(@RequestBody UserDto param) {
+//        return ResponseEntity.ok(userService.modify(param));
+//    }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Messenger> deleteById(@RequestParam("id") Long id) {
+    public ResponseEntity<MessengerVo> deleteById(@RequestParam("id") Long id) {
         return ResponseEntity.ok(userService.deleteById(id));
     }
 

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import site.toeicdoit.user.domain.dto.UserDto;
-import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.MessengerVo;
 // import site.toeicdoit.user.service.UserService;
 
 @RestController
@@ -18,22 +18,22 @@ public class AuthController {
     // private final UserService userService;
 
     @PostMapping("/login")
-    public Messenger login(@RequestBody UserDto userDto) {
-        return Messenger.builder().build();
+    public MessengerVo login(@RequestBody UserDto userDto) {
+        return MessengerVo.builder().build();
     }
 
     @PostMapping("/signup")
-    public Messenger signup(@RequestBody UserDto userDto) {
-        return Messenger.builder().build();
+    public MessengerVo signup(@RequestBody UserDto userDto) {
+        return MessengerVo.builder().build();
     }
 
     @PostMapping("/logout")
-    public Messenger logout() {
-        return Messenger.builder().build();
+    public MessengerVo logout() {
+        return MessengerVo.builder().build();
     }
 
     @GetMapping("/refresh")
-    public Messenger refresh() {
-        return Messenger.builder().build();
+    public MessengerVo refresh() {
+        return MessengerVo.builder().build();
     }
 }

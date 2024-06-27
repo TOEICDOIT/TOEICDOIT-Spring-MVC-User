@@ -10,6 +10,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
         return BoardModel.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
+                .type(dto.getType())
                 .build();
     }
 
@@ -18,6 +19,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
+                .type(entity.getType())
                 .build();
     }
 

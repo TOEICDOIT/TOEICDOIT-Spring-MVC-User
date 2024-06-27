@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import site.toeicdoit.user.domain.dto.UserDto;
 import site.toeicdoit.user.domain.model.jpa.UserModel;
-import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.MessengerVo;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.jpa.UserRepository;
 
@@ -23,46 +23,36 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
 
-    @Override
-    public Messenger save(UserDto dto) {
+    public MessengerVo save(UserDto dto) {
         var ent = repository.save(dtoToEntity(dto));
         System.out.println(" ============ UserServiceImpl save instanceof =========== ");
         System.out.println((ent instanceof UserModel) ? "SUCCESS" : "FAILURE");
-        return Messenger.builder()
+        return MessengerVo.builder()
                 .message((ent instanceof UserModel) ? "SUCCESS" : "FAILURE")
                 .build();
     }
 
     @Transactional
-    @Override
-    public Messenger deleteById(Long id) {
+    public MessengerVo deleteById(Long id) {
         log.info("deleteById Impl: " + id);
 
         // Check if the user exists before attempting to delete
         if (repository.existsById(id)) {
             repository.deleteById(id); // This will now trigger cascading deletes
-            return Messenger.builder().message("SUCCESS").build();
+            return MessengerVo.builder().message("SUCCESS").build();
         } else {
-            return Messenger.builder().message("FAILURE").build();
+            return MessengerVo.builder().message("FAILURE").build();
         }
     }
 
-    @Override
-    public Messenger modify(UserDto userDto) {
-        return null;
-    }
-
-    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return null;
     }
 
-    @Override
     public List<UserDto> findAll() {
         return List.of();
     }
 
-    @Override
     public Optional<UserDto> findById(Long id) {
         return Optional.empty();
     }
@@ -70,6 +60,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean existsById(Long id) {
         return null;
+    }
+
+    @Override
+    public UserModel dtoToEntity(UserDto dto) {
+        return UserService.super.dtoToEntity(dto);
+    }
+
+    @Override
+    public UserDto entityToDto(UserModel userModel) {
+        return UserService.super.entityToDto(userModel);
     }
 
 //    @Override
@@ -83,8 +83,8 @@ public class UserServiceImpl implements UserService {
 //    }
 //
 //    @Override
-//    public Messenger count() {
-//        return Messenger.builder()
+//    public MessengerVo count() {
+//        return MessengerVo.builder()
 //                .message(repository.count() + "")
 //                .build();
 //    }
@@ -94,9 +94,9 @@ public class UserServiceImpl implements UserService {
 //        return repository.existsById(id);
 //    }
 //
-//    @Transactional
-//    @Override
-//    public Messenger modify(UserDto dto) {
+    @Transactional
+    @Override
+    public MessengerVo modify(UserDto dto) {
 //        log.info("UserModel modify Impl: {}", dto);
 //
 //        UserModel ent = dtoToEntity(dto);
@@ -109,10 +109,11 @@ public class UserServiceImpl implements UserService {
 //        repository.updateUserById(id, password, job, addressId);
 //
 //        System.out.println((ent instanceof UserModel) ? "SUCCESS" : "FAILURE");
-//        return Messenger.builder()
+//        return MessengerVo.builder()
 //                .message((ent instanceof UserModel) ? "SUCCESS" : "FAILURE")
 //                .build();
-//    }
+        return null;
+    }
 //
 //    @Override
 //    public List<UserDto> findUsersByName(String name) {
@@ -133,7 +134,7 @@ public class UserServiceImpl implements UserService {
 //    // findUserByUsername(dto.getUsername()).get().getPassword().equals(dto.getPassword())?"S":"F"
 //    @Transactional
 //    @Override
-//    public Messenger login(UserDto dto) {
+//    public MessengerVo login(UserDto dto) {
 //        log.info("login Impl: " + dto);
 //        var user = repository.findUserByUsername(dto.getUsername()).get();
 //        var accessToken = jwt.createToken(entityToDto(user));
@@ -142,19 +143,19 @@ public class UserServiceImpl implements UserService {
 //        // 토큰을 각 섹션(Header, Payload, Signature)으로 분할
 //        jwt.printPayload(accessToken);
 //        repository.modifyTokenByToken(user.getId(), accessToken);
-//        return Messenger.builder()
+//        return MessengerVo.builder()
 //                .message(flag ? "SUCCESS" : "FAILURE")
 //                .accessToken(flag ? accessToken : "None")
 //                .build();
 //    }
 //
 //    @Override
-//    public Messenger existsByUsername(String username) {
+//    public MessengerVo existsByUsername(String username) {
 //        log.info("existsByUsername Impl: " + username);
 //        boolean flag = false;
 //        flag = repository.existsByUsername(username) != null;
 //        log.info("existsByUsername flag: " + flag);
-//        return Messenger.builder()
+//        return MessengerVo.builder()
 //                .message(flag ? "SUCCESS" : "FAILURE")
 //                .build();
 //    }

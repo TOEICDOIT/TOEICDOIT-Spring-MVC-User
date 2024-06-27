@@ -1,6 +1,7 @@
 package site.toeicdoit.user.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import site.toeicdoit.user.handler.OAuth2SuccessHandler;
 import site.toeicdoit.user.service.impl.CustomOAuth2UserServiceImpl;
 
@@ -28,10 +29,10 @@ public class SecurityConfig {
                         .requestMatchers("/login/oauth2/**").authenticated()
                         .anyRequest().permitAll()
                 )
-                .httpBasic(i -> i.disable())
-                .csrf(i -> i.disable())
-                .cors(i -> i.disable())
-                .formLogin(i -> i.disable())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
 
                 // oauth2 설정
                 .oauth2Login(oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
