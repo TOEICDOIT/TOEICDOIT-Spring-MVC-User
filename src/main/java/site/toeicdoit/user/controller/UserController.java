@@ -12,7 +12,7 @@ import site.toeicdoit.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
-@RequestMapping(path = "/api/users")
+@RequestMapping(path = "/api/user")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 @RestController

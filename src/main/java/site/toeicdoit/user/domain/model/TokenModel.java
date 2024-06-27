@@ -2,7 +2,7 @@ package site.toeicdoit.user.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import site.toeicdoit.user.domain.BaseEntity;
+import site.toeicdoit.user.domain.BaseModel;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @ToString(exclude = {"id"})
-public class TokenModel extends BaseEntity {
+public class TokenModel extends BaseModel {
 
     @Id
     @Column(name ="id", nullable = false)

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@RequestMapping(path = "/api/boards")
+@RequestMapping(path = "/api/board")
 @Log4j2
 @RestController
 @RequiredArgsConstructor
