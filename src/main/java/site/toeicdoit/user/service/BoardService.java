@@ -1,7 +1,7 @@
 package site.toeicdoit.user.service;
 
 import site.toeicdoit.user.domain.dto.BoardDto;
-import site.toeicdoit.user.domain.model.BoardModel;
+import site.toeicdoit.user.domain.model.jpa.BoardModel;
 
 
 public interface BoardService extends CommandService<BoardDto>, QueryService<BoardDto> {

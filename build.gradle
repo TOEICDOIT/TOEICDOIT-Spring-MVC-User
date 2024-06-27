@@ -63,6 +63,8 @@ dependencies {
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '4.1.2'
 
+    //Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 // gradle clean 시에 QClass 디렉토리 삭제

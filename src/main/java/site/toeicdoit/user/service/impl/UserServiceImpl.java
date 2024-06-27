@@ -7,11 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import site.toeicdoit.user.domain.Messenger;
+
 import site.toeicdoit.user.domain.dto.UserDto;
-import site.toeicdoit.user.repository.UserRepository;
+import site.toeicdoit.user.domain.model.jpa.UserModel;
+import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.service.UserService;
-import site.toeicdoit.user.domain.model.UserModel;
+import site.toeicdoit.user.repository.jpa.UserRepository;
 
 import java.util.*;
 
