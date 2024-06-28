@@ -1,8 +1,7 @@
-package site.toeicdoit.user.domain.model.jpa;
+package site.toeicdoit.user.domain.model.mysql;
 
 import jakarta.persistence.*;
 import lombok.*;
-import site.toeicdoit.user.domain.vo.Registration;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class UserModel extends BaseModel{
     private String name;
     private String phone;
     private Integer toeicLevel;
-    private Registration registration;
+    private String registration;
 
     @Setter
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)

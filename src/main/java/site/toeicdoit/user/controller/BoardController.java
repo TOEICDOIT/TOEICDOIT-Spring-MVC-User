@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.toeicdoit.user.domain.dto.BoardDto;
-import site.toeicdoit.user.domain.vo.MessengerVo;
+import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.service.BoardService;
 
 import java.util.List;
@@ -22,19 +22,19 @@ public class BoardController {
     private final BoardService service;
 
     @PostMapping("/save")
-    public ResponseEntity<MessengerVo> save(@RequestBody BoardDto dto) {
+    public ResponseEntity<Messenger> save(@RequestBody BoardDto dto) {
         log.info(">>save board con 진입: {}", dto);
         return ResponseEntity.ok(service.save(dto));
     }
 
     @PutMapping("/modify")
-    public ResponseEntity<MessengerVo> modify(@RequestBody BoardDto dto) {
+    public ResponseEntity<Messenger> modify(@RequestBody BoardDto dto) {
         log.info(">>> modify board con 진입: {}", dto);
         return ResponseEntity.ok(service.modify(dto));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<MessengerVo> deleteById(@RequestParam("id") Long id) {
+    public ResponseEntity<Messenger> deleteById(@RequestParam("id") Long id) {
         log.info(">>> delete board con 진입: {}", id);
         return ResponseEntity.ok(service.deleteById(id));
     }
