@@ -3,8 +3,6 @@ package site.toeicdoit.user.domain.model.mysql;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -25,6 +23,6 @@ public class BoardModel extends BaseModel {
     @JoinColumn(name = "user_id")
     private UserModel userId;
 
-    @OneToMany(mappedBy = "boardId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReplyModel> replyModels;
+    @OneToOne(mappedBy = "boardId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private ReplyModel replyId;
 }

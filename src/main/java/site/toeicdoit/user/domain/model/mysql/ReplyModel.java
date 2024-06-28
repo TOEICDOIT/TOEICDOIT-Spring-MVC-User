@@ -4,7 +4,6 @@ package site.toeicdoit.user.domain.model.mysql;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,7 +28,7 @@ public class ReplyModel extends BaseModel {
     private ReplyModel parent;
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
-    private List<ReplyModel> children = new ArrayList<>();
+    private List<ReplyModel> children;
 
     public ReplyModel(String content) {
         this.content = content;
@@ -52,11 +51,13 @@ public class ReplyModel extends BaseModel {
     }
 
 
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserModel userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private BoardModel boardId;
 

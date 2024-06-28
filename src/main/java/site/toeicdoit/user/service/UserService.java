@@ -3,6 +3,7 @@ package site.toeicdoit.user.service;
 import site.toeicdoit.user.domain.dto.UserDto;
 import site.toeicdoit.user.domain.model.mysql.UserModel;
 import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.Role;
 
 public interface UserService extends CommandService<UserDto>, QueryService<UserDto> {
 
@@ -35,6 +36,6 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
 
     Messenger count();
     Messenger modify(UserDto user);
-    Messenger login(UserDto dto);
+    Role localLogin(UserDto dto);
     Messenger existsByEmail(String email);
 }

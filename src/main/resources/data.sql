@@ -1,3 +1,4 @@
+
 insert into user_model (email, password, profile, name, phone, toeic_level, registration, created_at, update_at) values ('kmccamish0@unesco.org', '$2a$04$KVxjdmwuJ3zzFQ7KO7xvAukqhCfR23e6ptNPrqmn07w9pMZsBlH/G', 'http://dummyimage.com/243x100.png/ff4444/ffffff', 'Kipp McCamish', '1047095798', 1, 'LOCAL', now(), now());
 insert into user_model (email, password, profile, name, phone, toeic_level, registration, created_at, update_at) values ('eyele1@t.co', '$2a$04$GRrg/R0OhJ6FKm.klN0vDulLU59qZ5Dp6otnjrpqMFfA13qOQ2s1.', 'http://dummyimage.com/139x100.png/dddddd/000000', 'Elinore Yele', '3211114310', 2, 'LOCAL', now(), now());
 insert into user_model (email, password, profile, name, phone, toeic_level, registration, created_at, update_at) values ('alamminam2@army.mil', '$2a$04$9aCleBL.T9C3sNzkBWZMq.1JI1fdK2czsPVcDPIMdUnSWfPIXjYlW', 'http://dummyimage.com/193x100.png/ff4444/ffffff', 'Alasteir Lamminam', '2226191359', 3, 'LOCAL', now(), now());
@@ -21,3 +22,16 @@ insert into board_model (title, content, type, user_Id, created_at, update_at) v
 insert into board_model (title, content, type, user_Id, created_at, update_at) values ('Pontiac', 'Salvadora hexalepis', '자유', 10, now(), now());
 insert into board_model (title, content, type, user_Id, created_at, update_at) values ('Pontiac', 'Salvadora hexalepis', '자유', 10, now(), now());
 insert into board_model (title, content, type, user_Id, created_at, update_at) values ('Pontiac', 'Salvadora hexalepis', '자유', 10, now(), now());
+
+insert into role_model (role, user_id) values (0, 1);
+insert into role_model (role, user_id) values (1, 2);
+insert into role_model (role, user_id) values (2, 3);
+insert into role_model (role, user_id) values (0, 4);
+insert into role_model (role, user_id) values (1, 5);
+insert into role_model (role, user_id) values (2, 6);
+insert into role_model (role, user_id) values (0, 7);
+insert into role_model (role, user_id) values (1, 8);
+insert into role_model (role, user_id) values (2, 9);
+insert into role_model (role, user_id) values (0, 10);
+insert into role_model (role, user_id) values (1, 10);
+insert into role_model (role, user_id) values (2, 10);

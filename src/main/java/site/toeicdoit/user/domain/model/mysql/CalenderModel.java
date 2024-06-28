@@ -13,15 +13,17 @@ import java.time.LocalDateTime;
 @Getter
 @ToString(exclude = {"id"})
 public class CalenderModel extends BaseModel {
-
     @Id
-    @Column(name ="id", nullable = false)
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private Boolean allDay;
+    private boolean allDay;
+    @Setter
+    private String start;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -9,6 +9,7 @@ import site.toeicdoit.user.domain.dto.UserDto;
 import site.toeicdoit.user.domain.model.mysql.QUserModel;
 import site.toeicdoit.user.domain.model.mysql.UserModel;
 import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.Role;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.mysql.UserRepository;
 import java.util.List;
@@ -88,14 +89,12 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Messenger login(UserDto dto) {
-        log.info("login Impl 진입: " + dto);
+    public Role localLogin(UserDto dto) {
+        log.info(">>> localLogin Impl 진입: {} ", dto);
         var userModel = repository.findByEmail(dto.getEmail()).get();
         var flag = userModel.getPassword().equals(dto.getPassword());
 
-        return Messenger.builder()
-                .message(flag ? "SUCCESS" : "FAILURE")
-                .build();
+        return null;
     }
 
     @Override
