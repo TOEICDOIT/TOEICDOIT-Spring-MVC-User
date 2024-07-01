@@ -23,9 +23,10 @@ public class UserDto {
     private Integer toeicLevel;
     private String registration;
     private String role;
+    private Long subId;
 
-    private Long calenderId;
 
+    private Long calendarId;
     private String createdAt;
     private String updatedAt;
 

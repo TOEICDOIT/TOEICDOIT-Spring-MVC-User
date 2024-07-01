@@ -30,12 +30,12 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
                 .toeicLevel(userModel.getToeicLevel())
                 .registration(userModel.getRegistration())
                 .role(userModel.getRoleModels().toString())
-                .calenderId(userModel.getCalenderId().getId())
+                .calendarId(userModel.getCalendarId().getId())
                 .build();
     }
 
     Messenger count();
     Messenger modify(UserDto user);
-    Role localLogin(UserDto dto);
+    Messenger localLogin(UserDto dto);
     Messenger existsByEmail(String email);
 }

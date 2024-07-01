@@ -15,18 +15,18 @@ import site.toeicdoit.user.service.UserService;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-     private final UserService service;
-
-    @PostMapping("/local/login")
-    public ResponseEntity<Role> localLogin(@RequestBody UserDto dto) {
-        log.info(">>> local login con 진입: {} ", dto);
-        return ResponseEntity.ok(service.localLogin(dto));
-    }
+    private final UserService service;
 
     @PostMapping("/join")
     public ResponseEntity<Messenger> join(@RequestBody UserDto dto) {
         log.info(">>> join con 진입: {}", dto);
         return ResponseEntity.ok(service.save(dto));
+    }
+
+    @PostMapping("/local/login")
+    public ResponseEntity<Messenger> localLogin(@RequestBody UserDto dto) {
+        log.info(">>> local login con 진입: {} ", dto);
+        return ResponseEntity.ok(service.localLogin(dto));
     }
 
     @PostMapping("/oauth2/{registration}")

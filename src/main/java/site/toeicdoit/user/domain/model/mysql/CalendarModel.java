@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @ToString(exclude = {"id"})
-public class CalenderModel extends BaseModel {
+public class CalendarModel extends BaseModel {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

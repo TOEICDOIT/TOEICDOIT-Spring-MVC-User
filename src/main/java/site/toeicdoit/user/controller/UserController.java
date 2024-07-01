@@ -22,7 +22,7 @@ public class UserController {
 
     @SuppressWarnings("static-access")
     @GetMapping("/findAll")
-    public ResponseEntity<List<UserDto>> findAll(PageRequestVo vo) {
+    public ResponseEntity<List<UserDto>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 

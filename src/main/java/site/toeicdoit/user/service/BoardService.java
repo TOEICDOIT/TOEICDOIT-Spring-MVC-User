@@ -22,7 +22,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .content(entity.getContent())
 //                .userId(entity.getUserId().getId())
                 .createdAt(entity.getCreatedAt().toString())
-                .updatedAt(entity.getUpdateAt().toString())
+                .updatedAt(entity.getUpdatedAt().toString())
                 .type(entity.getType())
                 .build();
     }

@@ -2,7 +2,6 @@ package site.toeicdoit.user.domain.model.mysql;
 
 import jakarta.persistence.*;
 import lombok.*;
-import site.toeicdoit.user.domain.vo.Registration;
 
 import java.util.List;
 
@@ -23,11 +22,14 @@ public class UserModel extends BaseModel{
     private String email;
 
     private String password;
+
+    // 디폴트 이미지 추가
     private String profile;
     private String name;
     private String phone;
     private Integer toeicLevel;
     private String registration;
+    private Long subId;
 
     
     // ====================== user ========================
@@ -51,7 +53,7 @@ public class UserModel extends BaseModel{
     private List<SubscribeModel> subscribeIds;
 
     @OneToOne(mappedBy = "userId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private CalenderModel calenderId;
+    private CalendarModel calendarId;
 
     
 }

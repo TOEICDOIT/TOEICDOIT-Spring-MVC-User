@@ -57,7 +57,7 @@ public class ReplyModel extends BaseModel {
     @JoinColumn(name = "user_id")
     private UserModel userId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private BoardModel boardId;
 
