@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import site.toeicdoit.user.domain.dto.BoardDto;
 import site.toeicdoit.user.domain.model.mysql.BoardModel;
 import site.toeicdoit.user.domain.model.mysql.QBoardModel;
+import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.repository.mysql.BoardRepository;
 import site.toeicdoit.user.service.BoardService;
@@ -71,19 +72,24 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Messenger modify(BoardDto dto) {
         log.info(">>> Board Service Modify 진입: {}", dto);
-        BoardModel ent = dtoToEntity(dto);
-        Long id = dto.getId();
-        String title = dto.getTitle();
-        String content = dto.getContent();
-        Long result = queryFactory.update(boardModel)
-                .set(boardModel.title, title)
-                .set(boardModel.content, content)
-                .where(boardModel.id.eq(id))
-                .execute();
-        log.info(">>> Board modify 결과(Query DSL): {}", result);
-        System.out.println((ent instanceof BoardModel) ? "SUCCESS" : "FAILURE");
+        BoardModel board = boardRepository.findById(dto.getId()).orElse(null);
+        board.setContent(dto.getContent());
+        board.setTitle(dto.getTitle());
+        boardRepository.save(board);
+
+//        BoardModel ent = dtoToEntity(dto);
+//        Long id = dto.getId();
+//        String title = dto.getTitle();
+//        String content = dto.getContent();
+//        Long result = queryFactory.update(boardModel)
+//                .set(boardModel.title, title)
+//                .set(boardModel.content, content)
+//                .where(boardModel.id.eq(id))
+//                .execute();
+//        log.info(">>> Board modify 결과(Query DSL): {}", result);
+
         return Messenger.builder()
-                .message((ent instanceof BoardModel) ? "SUCCESS" : "FAILURE")
+                .message(MessageStatus.SUCCESS.name())
                 .build();
     }
 

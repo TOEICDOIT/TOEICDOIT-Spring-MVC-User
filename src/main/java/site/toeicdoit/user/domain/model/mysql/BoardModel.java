@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
+@Setter
 @ToString(exclude = {"id"})
 public class BoardModel extends BaseModel {
 
@@ -26,5 +27,5 @@ public class BoardModel extends BaseModel {
     private UserModel userId;
 
     @OneToMany(mappedBy = "boardId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReplyModel> replyId;
+    private List<ReplyModel> replyModels;
 }

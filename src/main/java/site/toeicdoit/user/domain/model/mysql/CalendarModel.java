@@ -18,14 +18,15 @@ public class CalendarModel extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private boolean allDay;
+    private Boolean allDay;
+
     @Setter
     private String start;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private UserModel userId;
 }

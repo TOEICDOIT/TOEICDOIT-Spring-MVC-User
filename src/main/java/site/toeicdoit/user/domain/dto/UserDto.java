@@ -27,7 +27,7 @@ public class UserDto {
 
 
     private Long calendarId;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

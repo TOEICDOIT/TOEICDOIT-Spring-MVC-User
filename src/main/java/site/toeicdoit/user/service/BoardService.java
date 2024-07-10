@@ -2,6 +2,7 @@ package site.toeicdoit.user.service;
 
 import site.toeicdoit.user.domain.dto.BoardDto;
 import site.toeicdoit.user.domain.model.mysql.BoardModel;
+import site.toeicdoit.user.domain.model.mysql.UserModel;
 
 
 public interface BoardService extends CommandService<BoardDto>, QueryService<BoardDto> {
@@ -10,7 +11,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
         return BoardModel.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
-//                .userId(UserModel.builder().id(dto.getUserId()).build())
+                .userId(UserModel.builder().id(dto.getUserId()).build())
                 .type(dto.getType())
                 .build();
     }
@@ -20,7 +21,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
-//                .userId(entity.getUserId().getId())
+                .userId(entity.getUserId().getId())
                 .createdAt(entity.getCreatedAt().toString())
                 .updatedAt(entity.getUpdatedAt().toString())
                 .type(entity.getType())

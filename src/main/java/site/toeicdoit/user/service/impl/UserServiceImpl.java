@@ -1,6 +1,7 @@
 package site.toeicdoit.user.service.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,14 +9,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import site.toeicdoit.user.domain.dto.UserDto;
-import site.toeicdoit.user.domain.model.mysql.QRoleModel;
-import site.toeicdoit.user.domain.model.mysql.QUserModel;
-import site.toeicdoit.user.domain.model.mysql.RoleModel;
-import site.toeicdoit.user.domain.model.mysql.UserModel;
+import site.toeicdoit.user.domain.model.mysql.*;
 import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.domain.vo.Registration;
 import site.toeicdoit.user.domain.vo.Role;
+import site.toeicdoit.user.repository.mysql.CalendarRepository;
 import site.toeicdoit.user.repository.mysql.RoleRepository;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.mysql.UserRepository;
@@ -32,17 +31,21 @@ public class UserServiceImpl implements UserService {
     private final QUserModel user = QUserModel.userModel;
     private final QRoleModel role = QRoleModel.roleModel;
     private final RoleRepository roleRepository;
+    private final CalendarRepository calendarRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public Messenger save(UserDto dto) {
+        // 아이디 있는지 없는지 찾는 로직 추가 필요 >> exists email 기능 구현됨
         log.info(">>> user save Impl 진입: {} ", dto);
         dto.setRegistration(Registration.LOCAL.name());
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
         var result = userRepository.save(dtoToEntity(dto));
-        log.info(">>> user save result : {}", result);
+        log.info(">>> user save 결과 : {}", result);
         var result1 = roleRepository.save(RoleModel.builder().role(0).userId(result).build());
-        log.info(">>> user save result : {}", result1);
+        log.info(">>> ROLE save 결과 : {}", result1);
+        var result2 = calendarRepository.save(CalendarModel.builder().userId(result).build());
+        log.info(">>> 캘린더 save 결과 : {}", result2);
 
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())
@@ -51,10 +54,10 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Messenger localLogin(UserDto dto) {
+    public Messenger login(UserDto dto) {
         log.info(">>> localLogin Impl 진입: {} ", dto);
         var loginUser = userRepository.findByEmail(dto.getEmail()).get();
-        log.info(">>> loginUser 결과 : {}", loginUser);
+//        log.info(">>> loginUser 결과 : {}", loginUser);
 
         return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword())  ?
                 Messenger.builder().message(MessageStatus.SUCCESS.name())
@@ -73,6 +76,18 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email) ?
                 Messenger.builder().message(MessageStatus.SUCCESS.name()).build() :
                 Messenger.builder().message(MessageStatus.FAILURE.name()).build();
+    }
+
+    // oauth 첫 가입 시 저장 로직 추가 필요
+    @Override
+    public Messenger oauthJoin(UserDto dto) {
+        log.info(">>> oauthJoin 진입: {}", dto);
+         Optional<UserModel> user  = userRepository.existsByEmail(dto.getEmail()) ?
+                userRepository.findByEmail(dto.getEmail()).stream().map(userRepository::save).findFirst()
+                : Optional.of(userRepository.save(dtoToEntity(dto)));
+        return Messenger.builder().message(MessageStatus.SUCCESS.name())
+                .data(user)
+                .build();
     }
 
     @Transactional
@@ -116,16 +131,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Messenger modify(UserDto dto) {
         log.info(">>> user modify Impl 진입: {}", dto);
-
-        UserModel ent = dtoToEntity(dto);
-
-        Optional<UserModel> result = userRepository.findById(ent.getId()).stream()
-                .map(userRepository::save).findFirst();
-        log.info(">>> user modify findFirst() 결과 : {}", result);
-
-        List<UserModel> result1 = userRepository.findById(ent.getId()).stream()
-                .map(userRepository::save).toList();
-        log.info(">>> user modify toList() 결과 : {}", result1);
+//        userRepository.findById(dto.getId())
+//                .map(i -> userRepository.save(dtoToEntity(dto))).orElse(null);
 
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())
