@@ -58,11 +58,15 @@ public class BoardController {
         return ResponseEntity.ok(service.findAll());
     }
 
-    @GetMapping("/find-by-types")
-    public ResponseEntity<List<BoardModel>> findByTypes(@RequestParam("type") String type) {
+    @GetMapping("/find-types")
+    public ResponseEntity<List<BoardDto>> findByTypes(@RequestParam("type") String type) {
         log.info(">>> findByType 진입 : {}", type);
         return ResponseEntity.ok(service.findByTypes(type));
     }
 
+    @GetMapping("/find-userId")
+    public ResponseEntity<List<BoardDto>> findByUserId(@RequestParam("id") Long id) {
+        return ResponseEntity.ok(service.findByUserId(id));
+    }
 
 }

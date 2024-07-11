@@ -5,6 +5,7 @@ import site.toeicdoit.user.domain.model.mysql.BoardModel;
 import site.toeicdoit.user.domain.model.mysql.UserModel;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface BoardService extends CommandService<BoardDto>, QueryService<BoardDto> {
@@ -33,5 +34,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .build();
     }
 
-    List<BoardModel> findByTypes(String type);
+    List<BoardDto> findByTypes(String type);
+
+    List<BoardDto> findByUserId(Long id);
 }

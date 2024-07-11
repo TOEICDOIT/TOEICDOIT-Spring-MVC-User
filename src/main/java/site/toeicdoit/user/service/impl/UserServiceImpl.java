@@ -29,8 +29,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final JPAQueryFactory queryFactory;
-    private final QUserModel QUser = QUserModel.userModel;
-    private final QRoleModel QRole = QRoleModel.roleModel;
+    private final QUserModel qUser = QUserModel.userModel;
+    private final QRoleModel qRole = QRoleModel.roleModel;
     private final RoleRepository roleRepository;
     private final CalendarRepository calendarRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -134,12 +134,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Messenger modify(UserDto dto) {
         log.info(">>> user modify Impl 진입: {}", dto);
-        var result = queryFactory.update(QUser)
-                .set(QUser.email, dto.getEmail())
-                .set(QUser.password, passwordEncoder.encode(dto.getPassword()))
-                .set(QUser.profile, dto.getProfile())
-                .set(QUser.phone, dto.getPhone())
-                .where(QUser.id.eq(dto.getId()))
+        var result = queryFactory.update(qUser)
+                .set(qUser.email, dto.getEmail())
+                .set(qUser.password, passwordEncoder.encode(dto.getPassword()))
+                .set(qUser.profile, dto.getProfile())
+                .set(qUser.phone, dto.getPhone())
+                .where(qUser.id.eq(dto.getId()))
                 .execute();
         log.info(">>> user modify 결과 : {}", result);
 

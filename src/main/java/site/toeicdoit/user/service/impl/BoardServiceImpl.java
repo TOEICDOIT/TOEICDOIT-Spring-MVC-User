@@ -1,5 +1,6 @@
 package site.toeicdoit.user.service.impl;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,10 @@ import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.repository.mysql.BoardRepository;
 import site.toeicdoit.user.service.BoardService;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -22,16 +25,16 @@ public class BoardServiceImpl implements BoardService {
 
     private final JPAQueryFactory queryFactory;
     private final BoardRepository boardRepository;
-    private final QBoardModel QBoard = QBoardModel.boardModel;
+    private final QBoardModel qBoard = QBoardModel.boardModel;
 
     @Transactional
     @Override
     public Messenger save(BoardDto dto) {
         log.info(">>> Board Service Save 진입: {}", dto);
         BoardModel result = boardRepository.save(dtoToEntity(dto));
-        System.out.println((result instanceof BoardModel) ? "SUCCESS" : "FAILURE");
+
         return Messenger.builder()
-                .message((result instanceof BoardModel) ? "SUCCESS" : "FAILURE")
+                .message(MessageStatus.SUCCESS.name())
                 .build();
     }
 
@@ -49,7 +52,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public List<BoardDto> findAll() {
-        return boardRepository.findAll().stream().map(i -> entityToDto(i)).toList();
+        return boardRepository.findAll().stream().map(this::entityToDto).toList();
     }
 
     @Override
@@ -69,11 +72,11 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Messenger modify(BoardDto dto) {
         log.info(">>> Board Service Modify 진입: {}", dto);
-        Long result = queryFactory.update(QBoard)
-                .set(QBoard.title, dto.getTitle())
-                .set(QBoard.content, dto.getContent())
-                .set(QBoard.category, dto.getCategory())
-                .where(QBoard.id.eq(dto.getId()))
+        Long result = queryFactory.update(qBoard)
+                .set(qBoard.title, dto.getTitle())
+                .set(qBoard.content, dto.getContent())
+                .set(qBoard.category, dto.getCategory())
+                .where(qBoard.id.eq(dto.getId()))
                 .execute();
         log.info(">>> Board modify 결과(Query DSL): {}", result);
         return Messenger.builder()
@@ -83,25 +86,19 @@ public class BoardServiceImpl implements BoardService {
 
 
     @Override
-    public List<BoardModel> findByTypes(String type) {
+    public List<BoardDto> findByTypes(String type) {
         log.info(">>> board findByTypes 진입 : {}", type);
-        List<BoardModel> result = queryFactory
-                .select(QBoard)
-                .from(QBoard)
-                .where(QBoard.type.eq(type))
+        List<BoardModel> result = queryFactory.selectFrom(qBoard)
+                .where(qBoard.type.eq(type))
                 .fetch();
-        result.stream().forEach(i -> System.out.println(i));
+        return result.stream().map(this::entityToDto).toList();
+    }
 
-
-
-//                .stream()
-//                .peek(System.out::println)
-//                .map(this::entityToDto)
-//                .toList();
-
-        log.info("result: {}", result.stream().map(i -> entityToDto(i)).toList());
-
-
-        return result;
+    @Override
+    public List<BoardDto> findByUserId(Long id) {
+        List<BoardModel> result = queryFactory.selectFrom(qBoard)
+                .where(qBoard.userId.id.eq(id))
+                .fetch();
+        return result.stream().map(this::entityToDto).toList();
     }
 }
