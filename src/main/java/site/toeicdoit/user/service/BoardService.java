@@ -4,6 +4,8 @@ import site.toeicdoit.user.domain.dto.BoardDto;
 import site.toeicdoit.user.domain.model.mysql.BoardModel;
 import site.toeicdoit.user.domain.model.mysql.UserModel;
 
+import java.util.List;
+
 
 public interface BoardService extends CommandService<BoardDto>, QueryService<BoardDto> {
 
@@ -13,6 +15,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .content(dto.getContent())
                 .userId(UserModel.builder().id(dto.getUserId()).build())
                 .type(dto.getType())
+                .category(dto.getCategory())
                 .build();
     }
 
@@ -22,10 +25,13 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .userId(entity.getUserId().getId())
+                .type(entity.getType())
+                .category(entity.getCategory())
+                .replyIds(entity.getReplyIds())
                 .createdAt(entity.getCreatedAt().toString())
                 .updatedAt(entity.getUpdatedAt().toString())
-                .type(entity.getType())
                 .build();
     }
 
+    List<BoardModel> findByTypes(String type);
 }

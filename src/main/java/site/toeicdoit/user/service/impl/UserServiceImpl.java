@@ -29,8 +29,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final JPAQueryFactory queryFactory;
-    private final QUserModel user = QUserModel.userModel;
-    private final QRoleModel role = QRoleModel.roleModel;
+    private final QUserModel QUser = QUserModel.userModel;
+    private final QRoleModel QRole = QRoleModel.roleModel;
     private final RoleRepository roleRepository;
     private final CalendarRepository calendarRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -41,15 +41,17 @@ public class UserServiceImpl implements UserService {
         log.info(">>> user save Impl 진입: {} ", dto);
         dto.setRegistration(Registration.LOCAL.name());
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        var result = userRepository.save(dtoToEntity(dto));
-        log.info(">>> user save 결과 : {}", result);
-        var result1 = roleRepository.save(RoleModel.builder().role(0).userId(result).build());
-        log.info(">>> ROLE save 결과 : {}", result1);
-        var result2 = calendarRepository.save(CalendarModel.builder().userId(result).build());
-        log.info(">>> 캘린더 save 결과 : {}", result2);
+
+        var joinUser = userRepository.save(dtoToEntity(dto));
+        log.info(">>> user save 결과 : {}", joinUser);
+        var joinUserRole= roleRepository.save(RoleModel.builder().role(0).userId(joinUser).build());
+        log.info(">>> ROLE save 결과 : {}", joinUserRole);
+        var joinUserCalendar = calendarRepository.save(CalendarModel.builder().userId(joinUser).build());
+        log.info(">>> 캘린더 save 결과 : {}", joinUserCalendar);
 
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())
+                .data(Role.getRole(joinUserRole.getRole()))
                 .build();
     }
 
@@ -132,13 +134,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Messenger modify(UserDto dto) {
         log.info(">>> user modify Impl 진입: {}", dto);
-        var result = queryFactory.update(user)
-                .set(user.email, dto.getEmail())
-                .set(user.password, passwordEncoder.encode(dto.getPassword()))
-                .set(user.profile, dto.getProfile())
-                .set(user.name, dto.getName())
-                .set(user.phone, dto.getPhone())
-                .where(user.id.eq(dto.getId()))
+        var result = queryFactory.update(QUser)
+                .set(QUser.email, dto.getEmail())
+                .set(QUser.password, passwordEncoder.encode(dto.getPassword()))
+                .set(QUser.profile, dto.getProfile())
+                .set(QUser.phone, dto.getPhone())
+                .where(QUser.id.eq(dto.getId()))
                 .execute();
         log.info(">>> user modify 결과 : {}", result);
 

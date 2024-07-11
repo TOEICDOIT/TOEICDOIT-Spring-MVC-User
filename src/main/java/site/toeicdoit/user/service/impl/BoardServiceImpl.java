@@ -1,6 +1,5 @@
 package site.toeicdoit.user.service.impl;
 
-
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +12,8 @@ import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.repository.mysql.BoardRepository;
 import site.toeicdoit.user.service.BoardService;
-
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @Slf4j
@@ -25,7 +22,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final JPAQueryFactory queryFactory;
     private final BoardRepository boardRepository;
-    private final QBoardModel boardModel = QBoardModel.boardModel;
+    private final QBoardModel QBoard = QBoardModel.boardModel;
 
     @Transactional
     @Override
@@ -72,10 +69,11 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Messenger modify(BoardDto dto) {
         log.info(">>> Board Service Modify 진입: {}", dto);
-        Long result = queryFactory.update(boardModel)
-                .set(boardModel.title, dto.getTitle())
-                .set(boardModel.content, dto.getContent())
-                .where(boardModel.id.eq(dto.getId()))
+        Long result = queryFactory.update(QBoard)
+                .set(QBoard.title, dto.getTitle())
+                .set(QBoard.content, dto.getContent())
+                .set(QBoard.category, dto.getCategory())
+                .where(QBoard.id.eq(dto.getId()))
                 .execute();
         log.info(">>> Board modify 결과(Query DSL): {}", result);
         return Messenger.builder()
@@ -84,4 +82,26 @@ public class BoardServiceImpl implements BoardService {
     }
 
 
+    @Override
+    public List<BoardModel> findByTypes(String type) {
+        log.info(">>> board findByTypes 진입 : {}", type);
+        List<BoardModel> result = queryFactory
+                .select(QBoard)
+                .from(QBoard)
+                .where(QBoard.type.eq(type))
+                .fetch();
+        result.stream().forEach(i -> System.out.println(i));
+
+
+
+//                .stream()
+//                .peek(System.out::println)
+//                .map(this::entityToDto)
+//                .toList();
+
+        log.info("result: {}", result.stream().map(i -> entityToDto(i)).toList());
+
+
+        return result;
+    }
 }

@@ -39,7 +39,6 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
     }
 
     Messenger count();
-    Messenger modify(UserDto user);
     Messenger login(UserDto dto);
     Messenger existsByEmail(String email);
     Messenger oauthJoin(UserDto dto);

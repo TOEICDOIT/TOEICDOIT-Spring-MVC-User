@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.toeicdoit.user.domain.dto.BoardDto;
+import site.toeicdoit.user.domain.model.mysql.BoardModel;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.service.BoardService;
 
@@ -51,10 +52,16 @@ public class BoardController {
         return ResponseEntity.ok(service.existsById(id));
     }
 
-    @GetMapping("/findAll")
+    @GetMapping("/find-all")
     public ResponseEntity<List<BoardDto>> findAll() {
         log.info(">>> exists findAll con 진입");
         return ResponseEntity.ok(service.findAll());
+    }
+
+    @GetMapping("/find-by-types")
+    public ResponseEntity<List<BoardModel>> findByTypes(@RequestParam("type") String type) {
+        log.info(">>> findByType 진입 : {}", type);
+        return ResponseEntity.ok(service.findByTypes(type));
     }
 
 
