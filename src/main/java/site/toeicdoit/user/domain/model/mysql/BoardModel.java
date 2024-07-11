@@ -27,5 +27,5 @@ public class BoardModel extends BaseModel {
     private UserModel userId;
 
     @OneToMany(mappedBy = "boardId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReplyModel> replyModels;
+    private List<ReplyModel> replyIds;
 }

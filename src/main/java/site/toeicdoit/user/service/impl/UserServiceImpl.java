@@ -18,6 +18,7 @@ import site.toeicdoit.user.repository.mysql.CalendarRepository;
 import site.toeicdoit.user.repository.mysql.RoleRepository;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.mysql.UserRepository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -59,14 +60,14 @@ public class UserServiceImpl implements UserService {
         var loginUser = userRepository.findByEmail(dto.getEmail()).get();
 //        log.info(">>> loginUser 결과 : {}", loginUser);
 
-        return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword())  ?
+        return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword()) ?
                 Messenger.builder().message(MessageStatus.SUCCESS.name())
-                        .data(loginUser.getRoleModels().stream()
-                        .map(RoleModel::getRole)
-                        .peek(System.out::println)
-                        .map(Role::getRole)
-                        .peek(System.out::println)
-                        .findFirst().orElse(null)).build() :
+                        .data(loginUser.getRoleIds().stream()
+                                .map(RoleModel::getRole)
+                                .peek(System.out::println)
+                                .map(Role::getRole)
+                                .peek(System.out::println)
+                                .findFirst().orElse(null)).build() :
                 Messenger.builder().message(MessageStatus.FAILURE.name()).build();
     }
 
@@ -82,7 +83,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Messenger oauthJoin(UserDto dto) {
         log.info(">>> oauthJoin 진입: {}", dto);
-         Optional<UserModel> user  = userRepository.existsByEmail(dto.getEmail()) ?
+        Optional<UserModel> user = userRepository.existsByEmail(dto.getEmail()) ?
                 userRepository.findByEmail(dto.getEmail()).stream().map(userRepository::save).findFirst()
                 : Optional.of(userRepository.save(dtoToEntity(dto)));
         return Messenger.builder().message(MessageStatus.SUCCESS.name())
@@ -131,8 +132,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public Messenger modify(UserDto dto) {
         log.info(">>> user modify Impl 진입: {}", dto);
-//        userRepository.findById(dto.getId())
-//                .map(i -> userRepository.save(dtoToEntity(dto))).orElse(null);
+        var result = queryFactory.update(user)
+                .set(user.email, dto.getEmail())
+                .set(user.password, passwordEncoder.encode(dto.getPassword()))
+                .set(user.profile, dto.getProfile())
+                .set(user.name, dto.getName())
+                .set(user.phone, dto.getPhone())
+                .where(user.id.eq(dto.getId()))
+                .execute();
+        log.info(">>> user modify 결과 : {}", result);
 
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())

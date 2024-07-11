@@ -72,22 +72,12 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Messenger modify(BoardDto dto) {
         log.info(">>> Board Service Modify 진입: {}", dto);
-        BoardModel board = boardRepository.findById(dto.getId()).orElse(null);
-        board.setContent(dto.getContent());
-        board.setTitle(dto.getTitle());
-        boardRepository.save(board);
-
-//        BoardModel ent = dtoToEntity(dto);
-//        Long id = dto.getId();
-//        String title = dto.getTitle();
-//        String content = dto.getContent();
-//        Long result = queryFactory.update(boardModel)
-//                .set(boardModel.title, title)
-//                .set(boardModel.content, content)
-//                .where(boardModel.id.eq(id))
-//                .execute();
-//        log.info(">>> Board modify 결과(Query DSL): {}", result);
-
+        Long result = queryFactory.update(boardModel)
+                .set(boardModel.title, dto.getTitle())
+                .set(boardModel.content, dto.getContent())
+                .where(boardModel.id.eq(dto.getId()))
+                .execute();
+        log.info(">>> Board modify 결과(Query DSL): {}", result);
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())
                 .build();

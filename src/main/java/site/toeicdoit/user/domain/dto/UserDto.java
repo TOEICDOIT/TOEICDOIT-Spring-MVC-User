@@ -23,7 +23,7 @@ public class UserDto {
     private Integer toeicLevel;
     private String registration;
     private String role;
-    private Long subId;
+    private Long oauthId;
 
 
     private Long calendarId;
