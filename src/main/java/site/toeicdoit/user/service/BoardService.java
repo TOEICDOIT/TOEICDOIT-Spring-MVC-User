@@ -1,5 +1,7 @@
 package site.toeicdoit.user.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import site.toeicdoit.user.domain.dto.BoardDto;
 import site.toeicdoit.user.domain.model.mysql.BoardModel;
 import site.toeicdoit.user.domain.model.mysql.UserModel;
@@ -34,7 +36,8 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .build();
     }
 
-    List<BoardDto> findByTypes(String type);
+    Page<BoardDto> findByTypes(String type, Pageable pageable);
 
     List<BoardDto> findByUserId(Long id);
+
 }

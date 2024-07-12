@@ -1,10 +1,13 @@
 package site.toeicdoit.user.service.impl;
 
-import com.querydsl.core.Tuple;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import site.toeicdoit.user.domain.dto.BoardDto;
 import site.toeicdoit.user.domain.model.mysql.BoardModel;
@@ -13,10 +16,8 @@ import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.repository.mysql.BoardRepository;
 import site.toeicdoit.user.service.BoardService;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -32,7 +33,7 @@ public class BoardServiceImpl implements BoardService {
     public Messenger save(BoardDto dto) {
         log.info(">>> Board Service Save 진입: {}", dto);
         BoardModel result = boardRepository.save(dtoToEntity(dto));
-
+        log.info(">>> Board Service Save result : {}", result);
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())
                 .build();
@@ -86,12 +87,25 @@ public class BoardServiceImpl implements BoardService {
 
 
     @Override
-    public List<BoardDto> findByTypes(String type) {
+    public Page<BoardDto> findByTypes(String type, Pageable pageable) {
         log.info(">>> board findByTypes 진입 : {}", type);
-        List<BoardModel> result = queryFactory.selectFrom(qBoard)
-                .where(qBoard.type.eq(type))
-                .fetch();
-        return result.stream().map(this::entityToDto).toList();
+        List<BoardDto> content = queryFactory.selectFrom(qBoard)
+//                .where(qBoard.type.eq(type))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+//                .orderBy(qBoard.id.desc())
+                .fetch()
+                .stream().map(this::entityToDto).toList()
+                ;
+
+        JPAQuery<Long> countQuery = queryFactory.select(qBoard.count())
+                .from(qBoard);
+//                .where(qBoard.type.eq(type));
+
+        log.info(">>> countQuery : {}", countQuery);
+
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override
@@ -101,4 +115,5 @@ public class BoardServiceImpl implements BoardService {
                 .fetch();
         return result.stream().map(this::entityToDto).toList();
     }
+
 }
