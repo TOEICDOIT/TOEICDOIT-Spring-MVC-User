@@ -5,6 +5,10 @@ import site.toeicdoit.user.domain.dto.UserDto;
 import site.toeicdoit.user.domain.model.PrincipalUserDetails;
 import site.toeicdoit.user.domain.model.mysql.UserModel;
 import site.toeicdoit.user.domain.vo.Messenger;
+import site.toeicdoit.user.domain.vo.Role;
+
+import java.util.Map;
+import java.util.Optional;
 
 public interface UserService extends CommandService<UserDto>, QueryService<UserDto> {
 
@@ -32,7 +36,7 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
                 .phone(userModel.getPhone())
                 .toeicLevel(userModel.getToeicLevel())
                 .registration(userModel.getRegistration())
-                .role(userModel.getRoleIds().toString())
+                .role(userModel.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
                 .calendarId(userModel.getCalendarId().getId())
                 .oauthId(userModel.getOauthId())
                 .createdAt(userModel.getCreatedAt())
@@ -40,8 +44,7 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
                 .build();
     }
 
-    Messenger count();
-    Messenger existsByEmail(String email);
-    PrincipalUserDetails oauthJoin(OAuth2UserDTO dto);
-    PrincipalUserDetails login(UserDto dto);
+    Map<?, ?> oauthJoin(OAuth2UserDTO dto);
+    Map<?, ?> login(UserDto dto);
+    Optional<UserDto> findByEmail(String email);
 }

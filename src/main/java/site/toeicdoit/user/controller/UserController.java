@@ -26,7 +26,13 @@ public class UserController {
         return ResponseEntity.ok(service.findAll());
     }
 
-    @GetMapping("/detail")
+
+    @GetMapping("/find-by-email")
+    public ResponseEntity<Optional<UserDto>> findByEmail(@RequestParam("email") String email) {
+        return ResponseEntity.ok(service.findByEmail(email));
+    }
+
+    @GetMapping("/find-by-id")
     public ResponseEntity<Optional<UserDto>> findById(@RequestParam("id") Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
@@ -41,14 +47,15 @@ public class UserController {
         return ResponseEntity.ok(service.deleteById(id));
     }
 
-    @GetMapping("/exists-id")
-    public ResponseEntity<Boolean> existsById(@RequestParam("id") Long id) {
-        return ResponseEntity.ok(service.existsById(id));
+    @GetMapping("/exist-by-id")
+    public ResponseEntity<Boolean> existById(@RequestParam("id") Long id) {
+        return ResponseEntity.ok(service.existById(id));
     }
 
-    @GetMapping("/count")
-    public ResponseEntity<Messenger> count() {
-        return ResponseEntity.ok(service.count());
+
+    @GetMapping("/count-all")
+    public ResponseEntity<Messenger> countAll() {
+        return ResponseEntity.ok(service.countAll());
     }
 
 }

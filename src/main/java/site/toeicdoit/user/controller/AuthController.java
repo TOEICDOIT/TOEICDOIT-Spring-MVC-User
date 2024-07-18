@@ -10,6 +10,8 @@ import site.toeicdoit.user.domain.model.PrincipalUserDetails;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.service.UserService;
 
+import java.util.Map;
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @Slf4j
 @RestController
@@ -18,33 +20,28 @@ import site.toeicdoit.user.service.UserService;
 public class AuthController {
     private final UserService service;
 
-    // local 회원가입
-    @PostMapping("/join")
+    @PostMapping("/join/local")
     public ResponseEntity<Messenger> localJoin(@RequestBody UserDto dto) {
         log.info(">>> localJoin con 진입: {}", dto);
         return ResponseEntity.ok(service.save(dto));
     }
 
-    // oauth 첫 로그인
-    @PostMapping("/oauth2/{registration}")
-    public ResponseEntity<PrincipalUserDetails> oauthJoin(@RequestBody OAuth2UserDTO dto) {
-        log.info(">>> oauthJoin con 진입: {}", dto);
-        return ResponseEntity.ok(service.oauthJoin(dto));
-//        return null;
-    }
-
-    // local에서 local, oauth 로그인
     @PostMapping("/login/local")
-    public ResponseEntity<PrincipalUserDetails> login(@RequestBody UserDto dto) {
+    public ResponseEntity<Map<?, ?>> login(@RequestBody UserDto dto) {
         log.info(">>> login con 진입: {} ", dto);
         return ResponseEntity.ok(service.login(dto));
     }
 
-    // 로그인 시 Email 존재 여부 확인
-    @GetMapping("/exists-email")
-    public ResponseEntity<Messenger> existsByEmail(@RequestParam("email") String email) {
-        log.info(">>> existsByEmail con: {}", email);
-        return ResponseEntity.ok(service.existsByEmail(email));
+    @PostMapping("/oauth2/{registration}")
+    public ResponseEntity<Map<?, ?>> oauthJoin(@RequestBody OAuth2UserDTO dto) {
+        log.info(">>> oauthJoin con 진입: {}", dto);
+        return ResponseEntity.ok(service.oauthJoin(dto));
+    }
+
+    @GetMapping("/exist-by-email")
+    public ResponseEntity<Boolean> existByEmail(@RequestParam("email") String email) {
+        log.info(">>> existByEmail con: {}", email);
+        return ResponseEntity.ok(service.existByEmail(email));
     }
 
 }

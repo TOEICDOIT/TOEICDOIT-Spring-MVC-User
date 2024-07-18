@@ -1,7 +1,6 @@
 package site.toeicdoit.user.service.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import site.toeicdoit.user.domain.dto.OAuth2UserDTO;
 import site.toeicdoit.user.domain.dto.UserDto;
-import site.toeicdoit.user.domain.model.PrincipalUserDetails;
 import site.toeicdoit.user.domain.model.mysql.*;
 import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
@@ -20,9 +18,7 @@ import site.toeicdoit.user.repository.mysql.CalendarRepository;
 import site.toeicdoit.user.repository.mysql.RoleRepository;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.mysql.UserRepository;
-
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -58,8 +54,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PrincipalUserDetails oauthJoin(OAuth2UserDTO dto) {
+    public Map<String, UserDto> oauthJoin(OAuth2UserDTO dto) {
         log.info(">>> oauthJoin 진입: {}", dto);
+        Map<String, UserDto> map = new HashMap<>();
         UserModel oauthUser = UserModel.builder()
                 .email(dto.email())
                 .name(dto.name())
@@ -70,34 +67,44 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(oauthUser.getEmail())){
             Optional<UserModel> existOauthUser = userRepository.findByEmail(dto.email()).stream()
                     .map(i -> userRepository.save(oauthUser)).findFirst();
-            return new PrincipalUserDetails(existOauthUser.get());
+            var setMap = map.put("user", new UserDto().builder()
+                    .email(existOauthUser.get().getEmail())
+                    .role(existOauthUser.get().getRoleIds().stream().map(i -> Role.getRole(i.getRole()))
+                            .toList()).build());
+            return (Map<String, UserDto>) setMap;
         } else {
             UserModel oauthSaveUser = userRepository.save(oauthUser);
             roleRepository.save(RoleModel.builder().role(0).userId(oauthUser).build());
             calendarRepository.save(CalendarModel.builder().userId(oauthUser).build());
-            return new PrincipalUserDetails(oauthSaveUser);
+            var setMap = map.put("user", new UserDto().builder()
+                    .email(oauthSaveUser.getEmail())
+                    .role(oauthSaveUser.getRoleIds().stream().map(i -> Role.getRole(i.getRole()))
+                            .toList()).build());
+            return (Map<String, UserDto>) setMap;
         }
     }
 
 
     @Transactional
     @Override
-    public PrincipalUserDetails login(UserDto dto) {
+    public Map<String, UserDto> login(UserDto dto) {
         log.info(">>> localLogin Impl 진입: {} ", dto);
         var loginUser = userRepository.findByEmail(dto.getEmail()).get();
+        Map<String, UserDto> map = new HashMap<>();
 //        log.info(">>> loginUser 결과 : {}", loginUser);
 
-        return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword()) ?
-                new PrincipalUserDetails(loginUser): new PrincipalUserDetails(null);
-
+//        return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword()) ?
+//                new PrincipalUserDetails(loginUser): new PrincipalUserDetails(null);
+        var setMap = map.put("user", new UserDto().builder().email(loginUser.getEmail())
+                .role(loginUser.getRoleIds().stream().map(i -> Role.getRole(i.getRole()))
+                        .toList()).build());
+        return (Map<String, UserDto>) setMap;
     }
 
     @Override
-    public Messenger existsByEmail(String email) {
+    public Boolean existByEmail(String email) {
         log.info(">>> existsByEmail Impl 진입: {}", email);
-        return userRepository.existsByEmail(email) ?
-                Messenger.builder().message(MessageStatus.SUCCESS.name()).build() :
-                Messenger.builder().message(MessageStatus.FAILURE.name()).build();
+        return userRepository.existsByEmail(email);
     }
 
 
@@ -127,14 +134,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Messenger count() {
+    public Optional<UserDto> findByEmail(String email) {
+        return userRepository.findByEmail(email).map(this::entityToDto);
+    }
+
+    @Override
+    public Messenger countAll() {
         return Messenger.builder()
-                .message(userRepository.count() + "")
+                .count(userRepository.count())
                 .build();
     }
 
     @Override
-    public Boolean existsById(Long id) {
+    public Boolean existById(Long id) {
         return userRepository.existsById(id);
     }
 

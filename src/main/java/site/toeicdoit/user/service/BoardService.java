@@ -28,6 +28,7 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .userId(entity.getUserId().getId())
+                .writerName(entity.getUserId().getName())
                 .type(entity.getType())
                 .category(entity.getCategory())
                 .replyIds(entity.getReplyIds())
@@ -36,8 +37,8 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
                 .build();
     }
 
-    Page<BoardDto> findByTypes(String type, Pageable pageable);
-
-    List<BoardDto> findByUserId(Long id);
+    Page<BoardDto> findAllByTypes(String type, Pageable pageable);
+    List<BoardDto> findAllByUserId(Long id);
+    List<BoardDto> findAllByEmail(String email);
 
 }

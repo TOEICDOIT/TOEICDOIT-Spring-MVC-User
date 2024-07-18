@@ -25,7 +25,7 @@ public class BoardDto {
     private List<ReplyModel> replyIds;
 
 
-    private String writer;
+    private String writerName;
     private String createdAt;
     private String updatedAt;
 }
