@@ -44,7 +44,7 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
                 .build();
     }
 
-    Map<?, ?> oauthJoin(OAuth2UserDTO dto);
-    Map<?, ?> login(UserDto dto);
+    UserDto oauthJoin(OAuth2UserDTO dto);
+    UserDto login(UserDto dto);
     Optional<UserDto> findByEmail(String email);
 }

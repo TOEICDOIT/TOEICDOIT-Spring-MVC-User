@@ -27,13 +27,13 @@ public class AuthController {
     }
 
     @PostMapping("/login/local")
-    public ResponseEntity<Map<?, ?>> login(@RequestBody UserDto dto) {
+    public ResponseEntity<UserDto> login(@RequestBody UserDto dto) {
         log.info(">>> login con 진입: {} ", dto);
         return ResponseEntity.ok(service.login(dto));
     }
 
     @PostMapping("/oauth2/{registration}")
-    public ResponseEntity<Map<?, ?>> oauthJoin(@RequestBody OAuth2UserDTO dto) {
+    public ResponseEntity<UserDto> oauthJoin(@RequestBody OAuth2UserDTO dto) {
         log.info(">>> oauthJoin con 진입: {}", dto);
         return ResponseEntity.ok(service.oauthJoin(dto));
     }

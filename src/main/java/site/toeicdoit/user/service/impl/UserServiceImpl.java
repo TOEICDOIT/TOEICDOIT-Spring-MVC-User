@@ -19,6 +19,7 @@ import site.toeicdoit.user.repository.mysql.RoleRepository;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.mysql.UserRepository;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Messenger save(UserDto dto) {
-        // 아이디 있는지 없는지 찾는 로직 추가 필요 >> exists email 기능 구현됨
         log.info(">>> user save Impl 진입: {} ", dto);
         dto.setRegistration(Registration.LOCAL.name());
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -49,14 +49,13 @@ public class UserServiceImpl implements UserService {
 
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())
-                .data(Role.getRole(joinUserRole.getRole()))
                 .build();
     }
 
     @Override
-    public Map<String, UserDto> oauthJoin(OAuth2UserDTO dto) {
-        log.info(">>> oauthJoin 진입: {}", dto);
-        Map<String, UserDto> map = new HashMap<>();
+    public UserDto oauthJoin(OAuth2UserDTO dto) {
+        log.info(">>> oauthJoin Impl 진입: {}", dto);
+
         UserModel oauthUser = UserModel.builder()
                 .email(dto.email())
                 .name(dto.name())
@@ -64,41 +63,30 @@ public class UserServiceImpl implements UserService {
                 .profile(dto.profile())
                 .registration(Registration.GOOGLE.name())
                 .build();
-        if (userRepository.existsByEmail(oauthUser.getEmail())){
+
+        if (userRepository.existsByEmail(oauthUser.getEmail())) {
             Optional<UserModel> existOauthUser = userRepository.findByEmail(dto.email()).stream()
                     .map(i -> userRepository.save(oauthUser)).findFirst();
-            var setMap = map.put("user", new UserDto().builder()
-                    .email(existOauthUser.get().getEmail())
-                    .role(existOauthUser.get().getRoleIds().stream().map(i -> Role.getRole(i.getRole()))
-                            .toList()).build());
-            return (Map<String, UserDto>) setMap;
+
+            return entityToDto(existOauthUser.get());
         } else {
-            UserModel oauthSaveUser = userRepository.save(oauthUser);
-            roleRepository.save(RoleModel.builder().role(0).userId(oauthUser).build());
-            calendarRepository.save(CalendarModel.builder().userId(oauthUser).build());
-            var setMap = map.put("user", new UserDto().builder()
-                    .email(oauthSaveUser.getEmail())
-                    .role(oauthSaveUser.getRoleIds().stream().map(i -> Role.getRole(i.getRole()))
-                            .toList()).build());
-            return (Map<String, UserDto>) setMap;
+            var oauthSaveUser = userRepository.save(oauthUser);
+            var saveRole = roleRepository.save(RoleModel.builder().role(0).userId(oauthSaveUser).build());
+            var cal = calendarRepository.save(CalendarModel.builder().userId(oauthSaveUser).build());
+
+            return entityToDto(saveRole.getUserId());
         }
     }
 
 
     @Transactional
     @Override
-    public Map<String, UserDto> login(UserDto dto) {
+    public UserDto login(UserDto dto) {
         log.info(">>> localLogin Impl 진입: {} ", dto);
         var loginUser = userRepository.findByEmail(dto.getEmail()).get();
-        Map<String, UserDto> map = new HashMap<>();
-//        log.info(">>> loginUser 결과 : {}", loginUser);
 
-//        return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword()) ?
-//                new PrincipalUserDetails(loginUser): new PrincipalUserDetails(null);
-        var setMap = map.put("user", new UserDto().builder().email(loginUser.getEmail())
-                .role(loginUser.getRoleIds().stream().map(i -> Role.getRole(i.getRole()))
-                        .toList()).build());
-        return (Map<String, UserDto>) setMap;
+        return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword()) ?
+                entityToDto(loginUser) : null;
     }
 
     @Override
