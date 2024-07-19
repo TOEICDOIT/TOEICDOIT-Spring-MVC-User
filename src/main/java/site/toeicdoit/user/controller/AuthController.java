@@ -4,13 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
-import site.toeicdoit.user.domain.dto.OAuth2UserDTO;
+import site.toeicdoit.user.domain.dto.LoginResultDto;
+import site.toeicdoit.user.domain.dto.OAuth2UserDto;
 import site.toeicdoit.user.domain.dto.UserDto;
-import site.toeicdoit.user.domain.model.PrincipalUserDetails;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.service.UserService;
-
-import java.util.Map;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @Slf4j
@@ -27,13 +25,13 @@ public class AuthController {
     }
 
     @PostMapping("/login/local")
-    public ResponseEntity<UserDto> login(@RequestBody UserDto dto) {
+    public ResponseEntity<LoginResultDto> login(@RequestBody UserDto dto) {
         log.info(">>> login con 진입: {} ", dto);
         return ResponseEntity.ok(service.login(dto));
     }
 
     @PostMapping("/oauth2/{registration}")
-    public ResponseEntity<UserDto> oauthJoin(@RequestBody OAuth2UserDTO dto) {
+    public ResponseEntity<LoginResultDto> oauthJoin(@RequestBody OAuth2UserDto dto) {
         log.info(">>> oauthJoin con 진입: {}", dto);
         return ResponseEntity.ok(service.oauthJoin(dto));
     }

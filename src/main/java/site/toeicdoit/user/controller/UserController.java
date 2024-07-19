@@ -38,9 +38,24 @@ public class UserController {
     }
 
     @PutMapping("/modify")
-    public ResponseEntity<Messenger> modify(@RequestBody UserDto param) {
-        return ResponseEntity.ok(service.modify(param));
+    public ResponseEntity<Messenger> modify(@RequestBody UserDto dto) {
+        return ResponseEntity.ok(service.modify(dto));
     }
+
+    @PutMapping("/modify-by-password")
+    public ResponseEntity<Messenger> modifyByPassword(@RequestBody UserDto dto) {
+        log.info(">>> modifyByPassword con 정보 : {} ", dto);
+        return ResponseEntity.ok(service.modifyByPassword(dto));
+    }
+
+    @PutMapping("/modify-by-keyword")
+    public ResponseEntity<Messenger> modifyByKeyword(@RequestBody UserDto dto) {
+        log.info(">>> modifyByKeyword con 정보 : {}", dto);
+
+        return ResponseEntity.ok(service.modifyByKeyword(dto));
+    }
+
+
 
     @DeleteMapping("/delete")
     public ResponseEntity<Messenger> deleteById(@RequestParam("id") Long id) {

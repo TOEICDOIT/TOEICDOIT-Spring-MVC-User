@@ -1,5 +1,6 @@
 package site.toeicdoit.user.service.impl;
 
+import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -7,17 +8,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import site.toeicdoit.user.domain.dto.OAuth2UserDTO;
+import site.toeicdoit.user.domain.dto.LoginResultDto;
+import site.toeicdoit.user.domain.dto.OAuth2UserDto;
 import site.toeicdoit.user.domain.dto.UserDto;
 import site.toeicdoit.user.domain.model.mysql.*;
 import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.domain.vo.Registration;
 import site.toeicdoit.user.domain.vo.Role;
+import site.toeicdoit.user.handler.AlreadyExistElementException;
 import site.toeicdoit.user.repository.mysql.CalendarRepository;
 import site.toeicdoit.user.repository.mysql.RoleRepository;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.mysql.UserRepository;
+
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -42,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
         var joinUser = userRepository.save(dtoToEntity(dto));
         log.info(">>> user save 결과 : {}", joinUser);
-        var joinUserRole= roleRepository.save(RoleModel.builder().role(0).userId(joinUser).build());
+        var joinUserRole = roleRepository.save(RoleModel.builder().role(0).userId(joinUser).build());
         log.info(">>> ROLE save 결과 : {}", joinUserRole);
         var joinUserCalendar = calendarRepository.save(CalendarModel.builder().userId(joinUser).build());
         log.info(">>> 캘린더 save 결과 : {}", joinUserCalendar);
@@ -53,9 +57,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto oauthJoin(OAuth2UserDTO dto) {
+    public LoginResultDto oauthJoin(OAuth2UserDto dto) {
         log.info(">>> oauthJoin Impl 진입: {}", dto);
-
         UserModel oauthUser = UserModel.builder()
                 .email(dto.email())
                 .name(dto.name())
@@ -63,30 +66,47 @@ public class UserServiceImpl implements UserService {
                 .profile(dto.profile())
                 .registration(Registration.GOOGLE.name())
                 .build();
-
         if (userRepository.existsByEmail(oauthUser.getEmail())) {
-            Optional<UserModel> existOauthUser = userRepository.findByEmail(dto.email()).stream()
-                    .map(i -> userRepository.save(oauthUser)).findFirst();
-
-            return entityToDto(existOauthUser.get());
+            UserModel existOauthUpdate = userRepository.findByEmail(dto.email())
+                    .stream()
+                    .map(i -> userRepository.save(oauthUser))
+                    .findFirst()
+                    .get();
+            return LoginResultDto.builder()
+                    .user(UserDto.builder()
+                            .email(existOauthUpdate.getEmail())
+                            .role(existOauthUpdate.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
+                            .build())
+                    .build();
         } else {
-            var oauthSaveUser = userRepository.save(oauthUser);
-            var saveRole = roleRepository.save(RoleModel.builder().role(0).userId(oauthSaveUser).build());
-            var cal = calendarRepository.save(CalendarModel.builder().userId(oauthSaveUser).build());
+            var newOauthSave = userRepository.save(oauthUser);
+            var roleSave = roleRepository.save(RoleModel.builder().role(0).userId(newOauthSave).build());
+            var calendarSave = calendarRepository.save(CalendarModel.builder().userId(newOauthSave).build());
 
-            return entityToDto(saveRole.getUserId());
+
+            return LoginResultDto.builder()
+                    .user(UserDto.builder()
+                            .email(newOauthSave.getEmail())
+                            .role(Stream.of(roleSave.getRole()).map(Role::getRole).toList())
+                            .build())
+                    .build();
         }
     }
 
 
     @Transactional
     @Override
-    public UserDto login(UserDto dto) {
+    public LoginResultDto login(UserDto dto) {
         log.info(">>> localLogin Impl 진입: {} ", dto);
-        var loginUser = userRepository.findByEmail(dto.getEmail()).get();
+        var existEmail = userRepository.findByEmail(dto.getEmail()).get();
 
-        return passwordEncoder.matches(dto.getPassword(), loginUser.getPassword()) ?
-                entityToDto(loginUser) : null;
+        return passwordEncoder.matches(dto.getPassword(), existEmail.getPassword()) ?
+                LoginResultDto.builder()
+                        .user(UserDto.builder()
+                                .email(existEmail.getEmail())
+                                .role(existEmail.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
+                                .build())
+                        .build() : null; // 비번 틀릴 경우 에러 처리 필요
     }
 
     @Override
@@ -142,18 +162,53 @@ public class UserServiceImpl implements UserService {
     @Override
     public Messenger modify(UserDto dto) {
         log.info(">>> user modify Impl 진입: {}", dto);
-        var result = queryFactory.update(qUser)
-                .set(qUser.email, dto.getEmail())
-                .set(qUser.password, passwordEncoder.encode(dto.getPassword()))
-                .set(qUser.profile, dto.getProfile())
-                .set(qUser.phone, dto.getPhone())
-                .where(qUser.id.eq(dto.getId()))
-                .execute();
-        log.info(">>> user modify 결과 : {}", result);
+        var updateUser = userRepository.findByEmail(dto.getEmail())
+                .stream().findFirst().map(i -> userRepository.save(dtoToEntity(dto)));
 
         return Messenger.builder()
                 .message(MessageStatus.SUCCESS.name())
                 .build();
     }
 
+    @Override
+    @Transactional
+    public Messenger modifyByPassword(UserDto dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            var updateUser = userRepository.findByEmail(dto.getEmail()).get();
+            if (passwordEncoder.matches(dto.getPassword(), updateUser.getPassword())) {
+                queryFactory.update(qUser).set(qUser.password, passwordEncoder.encode(dto.getNewPassword())).where(qUser.id.eq(updateUser.getId())).execute();
+                return Messenger.builder().message(MessageStatus.SUCCESS.name()).build();
+            } else {
+                return Messenger.builder().message("이전 비밀번호와 다릅니다.").build();
+            }
+        } else {
+            return Messenger.builder().message("email 정보가 존재하지 않습니다.").build();
+        }
+    }
+
+    @Override
+    @Transactional
+    public Messenger modifyByKeyword(UserDto dto) {
+        StringPath updateSet = null;
+
+        switch (dto.getUpdateKeyword()) {
+            case "email" : updateSet = qUser.email; break;
+            case "profile" : updateSet = qUser.profile; break;
+            case "phone" : updateSet = qUser.phone; break;
+            case "name" : updateSet = qUser.name; break;
+            default: break;
+        }
+
+        if (updateSet != null){
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                var updateUser = userRepository.findByEmail(dto.getEmail()).get();
+                queryFactory.update(qUser).set(updateSet, dto.getUpdateInfo()).where(qUser.id.eq(updateUser.getId())).execute();
+                return Messenger.builder().message(MessageStatus.SUCCESS.name()).build();
+            } else {
+                return Messenger.builder().message("email 정보가 존재하지 않습니다.").build();
+            }
+        } else {
+            return Messenger.builder().message("Keyword를 잘못 입력했습니다.").build();
+        }
+    }
 }

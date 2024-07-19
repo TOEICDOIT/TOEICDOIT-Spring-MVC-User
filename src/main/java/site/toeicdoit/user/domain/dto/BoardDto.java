@@ -11,8 +11,6 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Data
 @Builder
 public class BoardDto {
