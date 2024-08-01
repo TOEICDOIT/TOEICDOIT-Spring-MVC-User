@@ -22,7 +22,9 @@ public class UserModel extends BaseModel{
     private String email;
 
     private String password;
+    @Setter
     private String profile;
+    @Setter
     private String name;
     private String phone;
     private Integer toeicLevel;
@@ -31,7 +33,6 @@ public class UserModel extends BaseModel{
 
     // ====================== user ========================
 
-    @Setter
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoleModel> roleIds;
 

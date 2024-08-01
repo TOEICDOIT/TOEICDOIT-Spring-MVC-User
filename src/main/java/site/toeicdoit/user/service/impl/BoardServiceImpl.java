@@ -115,12 +115,25 @@ public class BoardServiceImpl implements BoardService {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
+
     @Override
-    public List<BoardDto> findAllByUserId(Long id) {
-        List<BoardModel> result = queryFactory.selectFrom(qBoard)
+    public Page<BoardDto> findAllByUserId(Long id, Pageable pageable) {
+        log.info(">>> board findAllByUserId 진입 : {}", id);
+        List<BoardDto> content = queryFactory.selectFrom(qBoard)
                 .where(qBoard.userId.id.eq(id))
-                .fetch();
-        return result.stream().map(this::entityToDto).toList();
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qBoard.id.desc())
+                .fetch()
+                .stream().map(this::entityToDto).toList();
+        log.info("findAllByUserId 결과 : {}", content);
+
+        JPAQuery<Long> countQuery = queryFactory.select(qBoard.count())
+                .from(qBoard)
+                .where(qBoard.userId.id.eq(id));
+
+        log.info(">>> countQuery : {}", countQuery);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override

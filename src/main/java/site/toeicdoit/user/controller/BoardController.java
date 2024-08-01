@@ -66,8 +66,9 @@ public class BoardController {
     }
 
     @GetMapping("/find-all-by-userId")
-    public ResponseEntity<List<BoardDto>> findAllByUserId(@RequestParam("id") Long id) {
-        return ResponseEntity.ok(service.findAllByUserId(id));
+    public ResponseEntity<Page<BoardDto>> findAllByUserId(@RequestParam("id") Long id, Pageable pageable) {
+        log.info(">>> findAllByUserId 진입 : {}, {}", id, pageable);
+        return ResponseEntity.ok(service.findAllByUserId(id, pageable));
     }
 
     @GetMapping("/find-all-by-email")

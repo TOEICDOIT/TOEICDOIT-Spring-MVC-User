@@ -4,6 +4,7 @@ package site.toeicdoit.user.domain.model.mysql;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,8 +20,6 @@ public class  ReplyModel extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-
-    // 대댓글 관련
     private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,7 +27,7 @@ public class  ReplyModel extends BaseModel {
     private ReplyModel parentId;
 
     @OneToMany(mappedBy = "parentId", orphanRemoval = true)
-    private List<ReplyModel> childrenIds;
+    private List<ReplyModel> childrenIds = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -37,26 +36,5 @@ public class  ReplyModel extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private BoardModel boardId;
-
-
-    public ReplyModel(String content) {
-        this.content = content;
-    }
-
-    public void updateUserId(UserModel userId) {
-        this.userId = userId;
-    }
-
-    public void updateBoard(BoardModel boardId) {
-        this.boardId = boardId;
-    }
-
-    public void updateParent(ReplyModel ReplyModel) {
-        this.parentId = ReplyModel;
-    }
-
-    public void changeIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
 
 }

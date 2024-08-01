@@ -9,6 +9,7 @@ import lombok.*;
 import site.toeicdoit.user.domain.vo.Role;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -38,7 +39,7 @@ public class UserDto {
     private String phone;
     private Integer toeicLevel;
     private String registration;
-    private List<Role> role;
+    private List<Role> roles;
     private String oauthId;
 
 
