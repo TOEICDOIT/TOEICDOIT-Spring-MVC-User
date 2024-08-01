@@ -22,10 +22,12 @@ public class UserModel extends BaseModel{
     private String email;
 
     private String password;
+
     @Setter
     private String profile;
     @Setter
     private String name;
+
     private String phone;
     private Integer toeicLevel;
     private String registration;

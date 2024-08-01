@@ -76,5 +76,12 @@ public class BoardController {
         return ResponseEntity.ok(service.findAllByEmail(email));
     }
 
+    @GetMapping("/find-all-by-type-title")
+    public ResponseEntity<Page<BoardDto>> findAllByTypeAndTitle(@RequestParam("type") String type,
+                                                                @RequestParam("title") String title,
+                                                                Pageable pageable) {
+        return ResponseEntity.ok(service.findAllByTypeAndTitle(type, title, pageable));
+    }
+
 
 }

@@ -104,8 +104,7 @@ public class BoardServiceImpl implements BoardService {
                 .limit(pageable.getPageSize())
                 .orderBy(qBoard.id.desc())
                 .fetch()
-                .stream().map(this::entityToDto).toList()
-                ;
+                .stream().map(this::entityToDto).toList();
 
         JPAQuery<Long> countQuery = queryFactory.select(qBoard.count())
                 .from(qBoard)
@@ -142,9 +141,24 @@ public class BoardServiceImpl implements BoardService {
 
         return existByEmail(email) ?
                 queryFactory.selectFrom(qBoard)
-                .where(qBoard.userId.email.eq(email))
-                .fetch().stream().map(this::entityToDto).toList()
+                        .where(qBoard.userId.email.eq(email))
+                        .fetch().stream().map(this::entityToDto).toList()
                 : null;
+    }
+
+    @Override
+    public Page<BoardDto> findAllByTypeAndTitle(String type, String title, Pageable pageable) {
+        var board = queryFactory.selectFrom(qBoard)
+                .where(qBoard.type.eq(type).and(qBoard.title.contains(title)))
+                .fetch().stream().map(this::entityToDto).toList();
+
+        log.info("JPAQuery<BoardModel> 결과 : {}", board);
+
+        JPAQuery<Long> countQuery = queryFactory.select(qBoard.count())
+                .from(qBoard)
+                .where(qBoard.type.eq(type).and(qBoard.title.contains(title)));
+
+        return PageableExecutionUtils.getPage(board, pageable, countQuery::fetchOne);
     }
 
 }

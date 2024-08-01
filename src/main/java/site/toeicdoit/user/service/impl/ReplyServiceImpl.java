@@ -1,4 +1,9 @@
 package site.toeicdoit.user.service.impl;
 
-public class ReplyServiceImpl {
+
+import lombok.RequiredArgsConstructor;
+import site.toeicdoit.user.service.ReplyService;
+
+@RequiredArgsConstructor
+public class ReplyServiceImpl implements ReplyService {
 }

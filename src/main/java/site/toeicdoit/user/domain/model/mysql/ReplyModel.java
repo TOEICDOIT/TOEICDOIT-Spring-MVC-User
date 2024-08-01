@@ -3,6 +3,8 @@ package site.toeicdoit.user.domain.model.mysql;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,23 +12,28 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 @Getter
+@Setter
+@Builder
 @ToString(exclude = {"id"})
-public class  ReplyModel extends BaseModel {
+public class ReplyModel extends BaseModel {
 
     @Id
     @Column(name ="id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String content;
-    private Boolean isDeleted;
+
+//    @ColumnDefault("FALSE")
+//    @Column(nullable = false)
+//    private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private ReplyModel parentId;
 
-    @OneToMany(mappedBy = "parentId", orphanRemoval = true)
+    @OneToMany(mappedBy = "parentId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReplyModel> childrenIds = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

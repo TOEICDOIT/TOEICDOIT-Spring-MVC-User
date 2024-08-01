@@ -40,5 +40,5 @@ public interface BoardService extends CommandService<BoardDto>, QueryService<Boa
     Page<BoardDto> findAllByTypes(String type, Pageable pageable);
     Page<BoardDto> findAllByUserId(Long id, Pageable pageable);
     List<BoardDto> findAllByEmail(String email);
-
+    Page<BoardDto> findAllByTypeAndTitle(String type, String title, Pageable pageable);
 }

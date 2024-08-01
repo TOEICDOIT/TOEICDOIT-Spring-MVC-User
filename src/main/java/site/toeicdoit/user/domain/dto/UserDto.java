@@ -1,6 +1,5 @@
 package site.toeicdoit.user.domain.dto;
 
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -9,7 +8,6 @@ import lombok.*;
 import site.toeicdoit.user.domain.vo.Role;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
