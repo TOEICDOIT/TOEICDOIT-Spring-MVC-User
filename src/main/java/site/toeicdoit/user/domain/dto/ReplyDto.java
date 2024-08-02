@@ -9,4 +9,7 @@ import lombok.*;
 public class ReplyDto {
     private Long id;
     private String content;
+    private Long userId;
+    private String writerName;
+    private Long boardId;
 }
