@@ -1,5 +1,6 @@
 package site.toeicdoit.user.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import site.toeicdoit.user.domain.model.mysql.CalendarModel;
 import site.toeicdoit.user.domain.vo.Role;
@@ -10,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
     private Long id;
     private String email;

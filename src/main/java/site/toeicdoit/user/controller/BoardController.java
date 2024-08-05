@@ -65,7 +65,7 @@ public class BoardController {
                                      @RequestParam(value = "category", required = false) String category,
                                      @RequestParam(value = "userId", required = false) Long userId,
                                      Pageable pageable) {
-        log.info("findByTest con 진입 : {}, {}, {}, {}", title, type, category, userId);
+        log.info("findBy con 진입 : {}, {}, {}, {}", title, type, category, userId);
         return ResponseEntity.ok(service.findBy(title, type, category, userId, pageable));
     }
 
