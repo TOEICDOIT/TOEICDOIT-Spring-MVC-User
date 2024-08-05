@@ -103,8 +103,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResultDto login(UserDto dto) {
         log.info(">>> localLogin Impl 진입: {} ", dto);
+        if (dto.getEmail().equals("admin")){
+            UserModel admin = userRepository.findByEmail(dto.getEmail()).get();
+            return admin.getPassword().equals(dto.getPassword())?
+                    LoginResultDto.builder()
+                            .user(UserDto.builder()
+                                    .id(admin.getId())
+                                    .email(admin.getEmail())
+                                    .roles(admin.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
+                                    .build())
+                            .build() : null;
+        }
         var existEmail = userRepository.findByEmail(dto.getEmail()).get();
-
         return passwordEncoder.matches(dto.getPassword(), existEmail.getPassword()) ?
                 LoginResultDto.builder()
                         .user(UserDto.builder()
@@ -184,12 +194,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Messenger modifyByPassword(UserDto dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            var updateUser = userRepository.findByEmail(dto.getEmail()).get();
-            if (passwordEncoder.matches(dto.getPassword(), updateUser.getPassword())) {
+    public Messenger modifyByPassword(Long id, String oldPassword, String newPassword) {
+        if (userRepository.existsById(id)) {
+            var updateUser = userRepository.findById(id).get();
+            if (passwordEncoder.matches(oldPassword, updateUser.getPassword())) {
                 queryFactory.update(qUser)
-                        .set(qUser.password, passwordEncoder.encode(dto.getNewPassword()))
+                        .set(qUser.password, passwordEncoder.encode(newPassword))
                         .where(qUser.id.eq(updateUser.getId()))
                         .execute();
                 return Messenger.builder().message(MessageStatus.SUCCESS.name()).build();
@@ -198,41 +208,6 @@ public class UserServiceImpl implements UserService {
             }
         } else {
             return Messenger.builder().message("email 정보가 존재하지 않습니다.").build();
-        }
-    }
-
-    @Override
-    @Transactional
-    public Messenger modifyByKeyword(UserDto dto) {
-        StringPath updateSet = null;
-
-        switch (dto.getUpdateKeyword()) {
-            case "email":
-                updateSet = qUser.email;
-                break;
-            case "profile":
-                updateSet = qUser.profile;
-                break;
-            case "phone":
-                updateSet = qUser.phone;
-                break;
-            case "name":
-                updateSet = qUser.name;
-                break;
-            default:
-                break;
-        }
-
-        if (updateSet != null) {
-            if (userRepository.existsByEmail(dto.getEmail())) {
-                var updateUser = userRepository.findByEmail(dto.getEmail()).get();
-                queryFactory.update(qUser).set(updateSet, dto.getUpdateInfo()).where(qUser.id.eq(updateUser.getId())).execute();
-                return Messenger.builder().message(MessageStatus.SUCCESS.name()).build();
-            } else {
-                return Messenger.builder().message("email 정보가 존재하지 않습니다람쥐 히히").build();
-            }
-        } else {
-            return Messenger.builder().message("Keyword를 잘못 입력했습니다.").build();
         }
     }
 
