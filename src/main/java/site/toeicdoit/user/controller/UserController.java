@@ -10,6 +10,7 @@ import site.toeicdoit.user.domain.vo.PageRequestVo;
 import site.toeicdoit.user.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequestMapping(path = "/api/user")
@@ -70,5 +71,9 @@ public class UserController {
         return ResponseEntity.ok(service.modifyByNameAndPhone(dto));
     }
 
+    @GetMapping("/find-by-name-profile")
+    public ResponseEntity<Map<Long, List<String>>> findByNameAndProfile(@RequestBody Map<String, List<Long>> ids){
+        return ResponseEntity.ok(service.findByNameAndProfile(ids));
+    }
 
 }

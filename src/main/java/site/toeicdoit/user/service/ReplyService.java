@@ -30,4 +30,5 @@ public interface ReplyService extends CommandService<ReplyDto> {
     }
 
     List<ReplyDto> findAllByBoardId(Long boardId);
+    List<ReplyDto> findAllByUserId(Long userId);
 }

@@ -16,11 +16,9 @@ import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.domain.vo.Registration;
 import site.toeicdoit.user.domain.vo.Role;
 import site.toeicdoit.user.handler.AlreadyExistElementException;
-import site.toeicdoit.user.repository.mysql.CalendarRepository;
 import site.toeicdoit.user.repository.mysql.RoleRepository;
 import site.toeicdoit.user.service.UserService;
 import site.toeicdoit.user.repository.mysql.UserRepository;
-
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -32,9 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JPAQueryFactory queryFactory;
     private final QUserModel qUser = QUserModel.userModel;
-    private final QRoleModel qRole = QRoleModel.roleModel;
     private final RoleRepository roleRepository;
-    private final CalendarRepository calendarRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
@@ -43,19 +39,17 @@ public class UserServiceImpl implements UserService {
         if (dto == null) {
             throw new ArithmeticException("입력된 내용이 없습니다.");
         } else if (!existByEmail(dto.getEmail())) {
-            log.info("저장 진입: {}", dto);
             dto.setRegistration(Registration.LOCAL.name());
             dto.setPassword(passwordEncoder.encode(dto.getPassword()));
             var result = Stream.of(userRepository.save(dtoToEntity(dto)))
-                    .map(i -> calendarRepository.save(CalendarModel.builder().userId(i).build()))
-                    .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i.getUserId()).build()))
+                    .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i).build()))
                     .findFirst().orElseThrow(() -> new AlreadyExistElementException("회원가입에 실패했습니다."));
             return Messenger.builder()
                     .message(MessageStatus.SUCCESS.name())
                     .build();
         } else {
             return Messenger.builder()
-                    .message("동일한 이메일이 존재합니다.")
+                    .message("동일한 Email이 존재합니다.")
                     .build();
         }
     }
@@ -94,8 +88,7 @@ public class UserServiceImpl implements UserService {
             }
         } else {
             RoleModel saveOauth = Stream.of(userRepository.save(user))
-                    .map(i -> calendarRepository.save(CalendarModel.builder().userId(i).build()))
-                    .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i.getUserId()).build()))
+                    .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i).build()))
                     .findFirst().orElseThrow(() -> new AlreadyExistElementException("회원가입 실패"));
             return LoginResultDto.builder()
                     .user(UserDto.builder()
@@ -111,7 +104,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public LoginResultDto login(UserDto dto) {
-        if (dto.getEmail().equals("admin")) {
+        if (dto.getEmail().equals("admin@test.com")) {
             UserModel admin = userRepository.findByEmail(dto.getEmail()).get();
             return admin.getPassword().equals(dto.getPassword()) ?
                     LoginResultDto.builder()
@@ -248,4 +241,19 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
     }
+
+
+
+    @Override
+    public Map<Long, List<String>> findByNameAndProfile(Map<String, List<Long>> ids) {
+        Map<Long, List<String>> userMap = new HashMap<>();
+        for (List<Long> list : ids.values()) {
+            for (Long id : list) {
+                UserDto user = findById(id).orElseThrow(() -> new AlreadyExistElementException("Email 정보가 없습니다."));
+                userMap.put(user.getId(), List.of(user.getName(), user.getProfile() == null ? "" : user.getProfile()));
+            }
+        }
+        return userMap;
+    }
+
 }

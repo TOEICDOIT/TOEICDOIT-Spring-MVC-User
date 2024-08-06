@@ -12,6 +12,7 @@ import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.handler.AlreadyExistElementException;
 import site.toeicdoit.user.repository.mysql.BoardRepository;
 import site.toeicdoit.user.repository.mysql.ReplyRepository;
+import site.toeicdoit.user.repository.mysql.UserRepository;
 import site.toeicdoit.user.service.ReplyService;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ReplyServiceImpl implements ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
     private final JPAQueryFactory queryFactory;
     private final QReplyModel qReply = QReplyModel.replyModel;
 
@@ -89,6 +91,20 @@ public class ReplyServiceImpl implements ReplyService {
                     .orderBy(qReply.id.asc())
                     .fetch().stream().map(this::entityToDto).toList();
         } else if (!boardRepository.existsById(boardId)) {
+            throw new AlreadyExistElementException("존재하는 게시물이 없습니다.");
+        } else {
+            throw new AlreadyExistElementException("작성된 내용이 없습니다.");
+        }
+    }
+
+    @Override
+    public List<ReplyDto> findAllByUserId(Long userId) {
+        if (userId != null && userRepository.existsById(userId)) {
+            return queryFactory.selectFrom(qReply)
+                    .where(qReply.userId.id.eq(userId))
+                    .orderBy(qReply.id.asc())
+                    .fetch().stream().map(this::entityToDto).toList();
+        } else if (!userRepository.existsById(userId)) {
             throw new AlreadyExistElementException("존재하는 게시물이 없습니다.");
         } else {
             throw new AlreadyExistElementException("작성된 내용이 없습니다.");

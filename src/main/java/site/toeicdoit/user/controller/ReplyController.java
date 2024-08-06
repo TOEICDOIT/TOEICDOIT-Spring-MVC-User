@@ -40,4 +40,9 @@ public class ReplyController {
         return ResponseEntity.ok(replyService.findAllByBoardId(boardId));
     }
 
+    @GetMapping("/find-all-by-userId")
+    public ResponseEntity<List<ReplyDto>> findAllByUserId(@RequestParam("userId") Long userId) {
+        return ResponseEntity.ok(replyService.findAllByUserId(userId));
+    }
+
 }
