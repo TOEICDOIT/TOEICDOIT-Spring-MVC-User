@@ -47,7 +47,6 @@ public class UserController {
     public ResponseEntity<Messenger> modifyByPassword(@RequestParam("id") Long id,
                                                       @RequestParam("oldPassword") String oldPassword,
                                                       @RequestParam("newPassword") String newPassword) {
-        log.info(">>> modifyByPassword con 진입 : {}, {}, {} ", id, oldPassword, newPassword);
         return ResponseEntity.ok(service.modifyByPassword(id, oldPassword, newPassword));
     }
 
@@ -68,7 +67,6 @@ public class UserController {
 
     @PutMapping("/modify-by-name-phone")
     public ResponseEntity<Messenger> modifyByNameAndPhone(@RequestBody UserDto dto) {
-        log.info(">>> modifyByNameAndPhone con 정보 : {}", dto);
         return ResponseEntity.ok(service.modifyByNameAndPhone(dto));
     }
 
