@@ -57,6 +57,6 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
     LoginResultDto login(UserDto dto);
     Optional<UserDto> findByEmail(String email);
 
-    Messenger modifyByPassword(Long id, String oldPassword, String newPassword);
+    Messenger modifyByPassword(String email, String oldPassword, String newPassword);
     Messenger modifyByNameAndPhone(UserDto dto);
 }

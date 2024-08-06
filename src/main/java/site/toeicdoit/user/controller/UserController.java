@@ -44,10 +44,10 @@ public class UserController {
     }
 
     @PutMapping("/modify-by-password")
-    public ResponseEntity<Messenger> modifyByPassword(@RequestParam("id") Long id,
+    public ResponseEntity<Messenger> modifyByPassword(@RequestParam("email") String email,
                                                       @RequestParam("oldPassword") String oldPassword,
                                                       @RequestParam("newPassword") String newPassword) {
-        return ResponseEntity.ok(service.modifyByPassword(id, oldPassword, newPassword));
+        return ResponseEntity.ok(service.modifyByPassword(email, oldPassword, newPassword));
     }
 
     @DeleteMapping("/delete")

@@ -38,33 +38,32 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
+    @Transactional
     public Messenger save(UserDto dto) {
         if (dto == null) {
             throw new ArithmeticException("입력된 내용이 없습니다.");
         } else if (!existByEmail(dto.getEmail())) {
+            log.info("저장 진입: {}", dto);
             dto.setRegistration(Registration.LOCAL.name());
             dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-
-            var joinUser = userRepository.save(dtoToEntity(dto));
-            log.info(">>> user save 결과 : {}", joinUser);
-            var joinUserRole = roleRepository.save(RoleModel.builder().role(0).userId(joinUser).build());
-            log.info(">>> ROLE save 결과 : {}", joinUserRole);
-            var joinUserCalendar = calendarRepository.save(CalendarModel.builder().userId(joinUser).build());
-            log.info(">>> 캘린더 save 결과 : {}", joinUserCalendar);
-
+            var result = Stream.of(userRepository.save(dtoToEntity(dto)))
+                    .map(i -> calendarRepository.save(CalendarModel.builder().userId(i).build()))
+                    .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i.getUserId()).build()))
+                    .findFirst().orElseThrow(() -> new AlreadyExistElementException("회원가입에 실패했습니다."));
             return Messenger.builder()
                     .message(MessageStatus.SUCCESS.name())
-                    .data(entityToDto(joinUser))
                     .build();
         } else {
             return Messenger.builder()
-                    .message("회원가입에 실패했습니다.")
+                    .message("동일한 이메일이 존재합니다.")
                     .build();
         }
     }
 
     @Override
+    @Transactional
     public LoginResultDto oauthJoinOrLogin(OAuth2UserDto dto, String registration) {
+        log.info("oauthJoinOrLogin impl 진입 : {}, {}", dto, registration);
         UserModel user = userRepository.findByEmail(dto.email())
                 .stream()
                 .peek(i -> i.setName(dto.name()))
@@ -77,8 +76,8 @@ public class UserServiceImpl implements UserService {
                         .oauthId(dto.id())
                         .registration(registration)
                         .build());
-        if (user.getRegistration().equals(Registration.GOOGLE.name())) {
-            if (existByEmail(dto.email())) {
+        if (existByEmail(dto.email())) {
+            if (user.getRegistration().equals(Registration.GOOGLE.name())) {
                 var existOauthUpdate = userRepository.save(user);
                 return LoginResultDto.builder()
                         .user(UserDto.builder()
@@ -88,24 +87,26 @@ public class UserServiceImpl implements UserService {
                                 .registration(existOauthUpdate.getRegistration())
                                 .build())
                         .build();
+            } else if (user.getRegistration().equals(Registration.LOCAL.name())) {
+                throw new AlreadyExistElementException("local에 가입된 정보가 있습니다.");
             } else {
-                var saveUser = userRepository.save(user);
-                var roleSave = roleRepository.save(RoleModel.builder().role(0).userId(saveUser).build());
-                var calendarSave = calendarRepository.save(CalendarModel.builder().userId(roleSave.getUserId()).build());
-                return LoginResultDto.builder()
-                        .user(UserDto.builder()
-                                .id(saveUser.getId())
-                                .email(saveUser.getEmail())
-                                .roles(Stream.of(roleSave.getRole()).map(Role::getRole).toList())
-                                .registration(saveUser.getRegistration())
-                                .build())
-                        .build();
+                throw new AlreadyExistElementException("접근 경로가 잘못되었습니다.");
             }
         } else {
-            throw new AlreadyExistElementException("접근 경로가 잘못되었습니다.");
+            RoleModel saveOauth = Stream.of(userRepository.save(user))
+                    .map(i -> calendarRepository.save(CalendarModel.builder().userId(i).build()))
+                    .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i.getUserId()).build()))
+                    .findFirst().orElseThrow(() -> new AlreadyExistElementException("회원가입 실패"));
+            return LoginResultDto.builder()
+                    .user(UserDto.builder()
+                            .id(saveOauth.getUserId().getId())
+                            .email(saveOauth.getUserId().getEmail())
+                            .roles(List.of(Role.getRole(saveOauth.getRole())))
+                            .registration(saveOauth.getUserId().getRegistration())
+                            .build())
+                    .build();
         }
     }
-
 
     @Transactional
     @Override
@@ -118,6 +119,7 @@ public class UserServiceImpl implements UserService {
                                     .id(admin.getId())
                                     .email(admin.getEmail())
                                     .roles(admin.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
+                                    .registration("LOCAL")
                                     .build())
                             .build() : null;
         }
@@ -186,7 +188,7 @@ public class UserServiceImpl implements UserService {
             return Messenger.builder()
                     .message("입력된 정보가 없습니다.")
                     .build();
-        } else if (existByEmail(dto.getEmail())){
+        } else if (existByEmail(dto.getEmail())) {
             var updateUser = queryFactory.update(qUser)
                     .set(qUser.name, dto.getName())
                     .set(qUser.email, dto.getEmail())
@@ -206,9 +208,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Messenger modifyByPassword(Long id, String oldPassword, String newPassword) {
-        if (userRepository.existsById(id)) {
-            var updateUser = userRepository.findById(id).get();
+    public Messenger modifyByPassword(String email, String oldPassword, String newPassword) {
+        if (userRepository.existsByEmail(email)) {
+            var updateUser = userRepository.findByEmail(email).get();
             if (passwordEncoder.matches(oldPassword, updateUser.getPassword())) {
                 queryFactory.update(qUser)
                         .set(qUser.password, passwordEncoder.encode(newPassword))
@@ -230,7 +232,7 @@ public class UserServiceImpl implements UserService {
             return Messenger.builder()
                     .message("입력된 정보가 없습니다.")
                     .build();
-        } else if (existByEmail(dto.getEmail())){
+        } else if (existByEmail(dto.getEmail())) {
             long user = queryFactory.update(qUser)
                     .set(qUser.name, dto.getName())
                     .set(qUser.phone, dto.getPhone())
