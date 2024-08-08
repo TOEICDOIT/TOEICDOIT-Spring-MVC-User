@@ -5,14 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.toeicdoit.user.domain.dto.ReplyDto;
-import site.toeicdoit.user.domain.model.mysql.QReplyModel;
-import site.toeicdoit.user.domain.model.mysql.ReplyModel;
+import site.toeicdoit.user.domain.model.QReplyModel;
+import site.toeicdoit.user.domain.model.ReplyModel;
 import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
-import site.toeicdoit.user.handler.AlreadyExistElementException;
-import site.toeicdoit.user.repository.mysql.BoardRepository;
-import site.toeicdoit.user.repository.mysql.ReplyRepository;
-import site.toeicdoit.user.repository.mysql.UserRepository;
+import site.toeicdoit.user.exception.ExceptionStatus;
+import site.toeicdoit.user.exception.UserException;
+import site.toeicdoit.user.repository.BoardRepository;
+import site.toeicdoit.user.repository.ReplyRepository;
+import site.toeicdoit.user.repository.UserRepository;
 import site.toeicdoit.user.service.ReplyService;
 
 import java.util.List;
@@ -27,60 +28,38 @@ public class ReplyServiceImpl implements ReplyService {
     private final QReplyModel qReply = QReplyModel.replyModel;
 
     @Override
-    public Messenger save(ReplyDto replyDto) {
+    public ReplyDto save(ReplyDto replyDto) {
         if (replyDto != null) {
-            ReplyModel reply = replyRepository.save(dtoToEntity(replyDto));
-            return Messenger.builder()
-                    .message(MessageStatus.SUCCESS.name())
-                    .data(entityToDto(reply))
-                    .build();
+            Long id = replyRepository.save(dtoToEntity(replyDto)).getId();
+            return findById(id);
         } else {
-            return Messenger.builder()
-                    .message("저장에 실패했습니다.")
-                    .build();
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
         }
     }
 
     @Override
-    public Messenger deleteById(Long id) {
-        if (id != null && replyRepository.existsById(id)) {
+    public void deleteById(Long id) {
+        if (existById(id)) {
             replyRepository.deleteById(id);
-            return Messenger.builder()
-                    .message(MessageStatus.SUCCESS.name())
-                    .build();
         } else {
-            return Messenger.builder()
-                    .message("존재하는 댓글이 없습니다.")
-                    .build();
+            throw new UserException(ExceptionStatus.NOT_FOUND, "id not found");
         }
     }
 
     @Override
     @Transactional
-    public Messenger modify(ReplyDto replyDto) {
-        if (replyDto != null && replyRepository.existsById(replyDto.getId())) {
-             Long modReply = queryFactory.update(qReply)
+    public ReplyDto modifyByContent(ReplyDto replyDto) {
+        if (replyDto != null && existById(replyDto.getId())) {
+             queryFactory.update(qReply)
                     .set(qReply.content, replyDto.getContent())
                     .where(qReply.id.eq(replyDto.getId()))
                     .execute();
-            return Messenger.builder()
-                    .message(MessageStatus.SUCCESS.name())
-                    .data(replyRepository.findById(modReply))
-                    .build();
-        } else if (!replyRepository.existsById(replyDto.getId())) {
-            return Messenger.builder()
-                    .message("존재하는 댓글이 없습니다.")
-                    .build();
+             return findById(replyDto.getId());
+        } else if (replyDto == null) {
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
         } else {
-            return Messenger.builder()
-                    .message("작성된 내용이 없습니다.")
-                    .build();
+            throw new UserException(ExceptionStatus.NOT_FOUND, "id not found");
         }
-    }
-
-    @Override
-    public Messenger countAll() {
-        return null;
     }
 
     @Override
@@ -90,10 +69,10 @@ public class ReplyServiceImpl implements ReplyService {
                     .where(qReply.boardId.id.eq(boardId))
                     .orderBy(qReply.id.asc())
                     .fetch().stream().map(this::entityToDto).toList();
-        } else if (!boardRepository.existsById(boardId)) {
-            throw new AlreadyExistElementException("존재하는 게시물이 없습니다.");
+        } else if (boardId == null) {
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
         } else {
-            throw new AlreadyExistElementException("작성된 내용이 없습니다.");
+            throw new UserException(ExceptionStatus.NOT_FOUND, "id not found");
         }
     }
 
@@ -104,10 +83,32 @@ public class ReplyServiceImpl implements ReplyService {
                     .where(qReply.userId.id.eq(userId))
                     .orderBy(qReply.id.asc())
                     .fetch().stream().map(this::entityToDto).toList();
-        } else if (!userRepository.existsById(userId)) {
-            throw new AlreadyExistElementException("존재하는 게시물이 없습니다.");
+        } else if (userId == null) {
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
         } else {
-            throw new AlreadyExistElementException("작성된 내용이 없습니다.");
+            throw new UserException(ExceptionStatus.NOT_FOUND, "id not found");
         }
+    }
+
+    @Override
+    public List<ReplyDto> findAll() {
+        return replyRepository.findAll().stream().map(this::entityToDto).toList();
+    }
+
+    @Override
+    public ReplyDto findById(Long id) {
+        if(id == null){
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
+        }
+        return replyRepository.findById(id).map(this::entityToDto)
+                .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "id not found"));
+    }
+
+    @Override
+    public Boolean existById(Long id) {
+        if(id == null){
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "id is null");
+        }
+        return replyRepository.existsById(id);
     }
 }
