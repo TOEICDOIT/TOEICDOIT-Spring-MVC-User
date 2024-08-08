@@ -1,6 +1,7 @@
 package site.toeicdoit.user.exception;
 
 import lombok.Getter;
+import site.toeicdoit.user.domain.vo.ExceptionStatus;
 
 @Getter
 public class UserException extends RuntimeException {
@@ -17,7 +18,7 @@ public class UserException extends RuntimeException {
     }
 
     public static UserException toUserException(Throwable e) {
-        return toUserException(e, ExceptionStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+        return toUserException(e, ExceptionStatus.INTERNAL_SERVER_ERROR, "Global Handler Executed");
     }
 
     public static UserException toUserException(Throwable e, ExceptionStatus status, String message) {

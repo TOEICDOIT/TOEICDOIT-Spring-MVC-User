@@ -1,4 +1,4 @@
-package site.toeicdoit.user.exception;
+package site.toeicdoit.user.domain.vo;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

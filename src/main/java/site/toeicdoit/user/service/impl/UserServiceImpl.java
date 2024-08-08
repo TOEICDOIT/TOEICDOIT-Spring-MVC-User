@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import site.toeicdoit.user.domain.model.RoleModel;
 import site.toeicdoit.user.domain.model.UserModel;
 import site.toeicdoit.user.domain.vo.Registration;
 import site.toeicdoit.user.domain.vo.Role;
-import site.toeicdoit.user.exception.ExceptionStatus;
+import site.toeicdoit.user.domain.vo.ExceptionStatus;
 import site.toeicdoit.user.exception.UserException;
 import site.toeicdoit.user.repository.RoleRepository;
 import site.toeicdoit.user.service.UserService;
@@ -39,8 +40,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto save(UserDto dto) {
-        if (dto == null) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
+        if (dto.getEmail().isEmpty() || dto.getPassword().isEmpty()) {
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "Email or password cannot be empty");
         } else {
             dto.setRegistration(Registration.LOCAL.name());
             dto.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -59,68 +60,68 @@ public class UserServiceImpl implements UserService {
                     .createdAt(saveUser.getCreatedAt())
                     .updatedAt(saveUser.getUpdatedAt())
                     .build();
-
         }
     }
 
     @Override
     @Transactional
     public LoginResultDto oauthJoinOrLogin(OAuth2UserDto dto, String registration) {
-        if (dto == null || registration.isEmpty()) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        }
-        UserModel user = userRepository.findByEmail(dto.email())
-                .stream()
-                .peek(i -> i.setName(dto.name()))
-                .peek(i -> i.setProfile(dto.profile()))
-                .findAny()
-                .orElseGet(() -> UserModel.builder()
-                        .email(dto.email())
-                        .name(dto.name())
-                        .profile(dto.profile())
-                        .oauthId(dto.id())
-                        .registration(registration)
-                        .build());
-        if (existByEmail(dto.email())) {
-            if (user.getRegistration().equals(Registration.GOOGLE.name())) {
-                var existOauthUpdate = userRepository.save(user);
+        if (dto.getEmail().isEmpty() || registration.isEmpty()) {
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "Email or registration cannot be empty");
+        } else {
+            UserModel user = userRepository.findByEmail(dto.getEmail())
+                    .stream()
+                    .peek(i -> i.setName(dto.getName()))
+                    .peek(i -> i.setProfile(dto.getProfile()))
+                    .findAny()
+                    .orElseGet(() -> UserModel.builder()
+                            .email(dto.getEmail())
+                            .name(dto.getName())
+                            .profile(dto.getProfile())
+                            .oauthId(dto.getId())
+                            .registration(registration)
+                            .build());
+            if (existByEmail(dto.getEmail())) {
+                if (user.getRegistration().equals(Registration.GOOGLE.name())) {
+                    var existOauthUpdate = userRepository.save(user);
+                    return LoginResultDto.builder()
+                            .user(UserDto.builder()
+                                    .id(existOauthUpdate.getId())
+                                    .email(existOauthUpdate.getEmail())
+                                    .roles(existOauthUpdate.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
+                                    .registration(existOauthUpdate.getRegistration())
+                                    .build())
+                            .build();
+                } else {
+                    throw new UserException(ExceptionStatus.UNAUTHORIZED, "local에 이미 가입된 정보가 있습니다.");
+                }
+            } else {
+                RoleModel saveOauth = Stream.of(userRepository.save(user))
+                        .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i).build()))
+                        .findFirst().orElseThrow(() -> new UserException(ExceptionStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
                 return LoginResultDto.builder()
                         .user(UserDto.builder()
-                                .id(existOauthUpdate.getId())
-                                .email(existOauthUpdate.getEmail())
-                                .roles(existOauthUpdate.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
-                                .registration(existOauthUpdate.getRegistration())
+                                .id(saveOauth.getUserId().getId())
+                                .email(saveOauth.getUserId().getEmail())
+                                .roles(List.of(Role.getRole(saveOauth.getRole())))
+                                .registration(saveOauth.getUserId().getRegistration())
                                 .build())
                         .build();
-            } else {
-                throw new UserException(ExceptionStatus.UNAUTHORIZED, "local에 이미 가입된 정보가 있습니다.");
             }
-        } else {
-            RoleModel saveOauth = Stream.of(userRepository.save(user))
-                    .map(i -> roleRepository.save(RoleModel.builder().role(0).userId(i).build()))
-                    .findFirst().orElseThrow(() -> new UserException(ExceptionStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
-            return LoginResultDto.builder()
-                    .user(UserDto.builder()
-                            .id(saveOauth.getUserId().getId())
-                            .email(saveOauth.getUserId().getEmail())
-                            .roles(List.of(Role.getRole(saveOauth.getRole())))
-                            .registration(saveOauth.getUserId().getRegistration())
-                            .build())
-                    .build();
         }
     }
 
     @Override
     @Transactional
     public LoginResultDto login(UserDto dto) {
-        if (dto == null) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        }
-        if (dto.getEmail().equals("admin@test.com")) {
-            UserModel adminAccount = userRepository.findByEmail(dto.getEmail())
-                    .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "Email not found"));
-            return adminAccount.getPassword().equals(dto.getPassword()) ?
-                    LoginResultDto.builder()
+        if (dto.getEmail().isEmpty() || dto.getPassword().isEmpty()) {
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "Email or password cannot be empty");
+        } else {
+            if (dto.getEmail().equals("admin@test.com")) {
+                UserModel adminAccount = userRepository.findByEmail(dto.getEmail())
+                        .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "Email not found"));
+                if (adminAccount.getPassword().equals(dto.getPassword())) {
+                    return LoginResultDto.builder()
                             .user(UserDto.builder()
                                     .id(adminAccount.getId())
                                     .email(adminAccount.getEmail())
@@ -128,29 +129,30 @@ public class UserServiceImpl implements UserService {
                                             .stream().map(i -> Role.getRole(i.getRole())).toList())
                                     .registration("LOCAL")
                                     .build())
-                            .build() : null;
-        }
-        UserModel existEmail = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "Email not found"));
-        if (passwordEncoder.matches(dto.getPassword(), existEmail.getPassword())) {
-            return LoginResultDto.builder()
-                    .user(UserDto.builder()
-                            .id(existEmail.getId())
-                            .email(existEmail.getEmail())
-                            .roles(existEmail.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
-                            .registration(existEmail.getRegistration())
-                            .build())
-                    .build();
-        } else{
-            throw new UserException(ExceptionStatus.UNAUTHORIZED, "wrong password");
+                            .build();
+                } else {
+                    throw new UserException(ExceptionStatus.UNAUTHORIZED, "wrong password");
+                }
+            }
+            UserModel existEmail = userRepository.findByEmail(dto.getEmail())
+                    .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "Email not found"));
+            if (passwordEncoder.matches(dto.getPassword(), existEmail.getPassword())) {
+                return LoginResultDto.builder()
+                        .user(UserDto.builder()
+                                .id(existEmail.getId())
+                                .email(existEmail.getEmail())
+                                .roles(existEmail.getRoleIds().stream().map(i -> Role.getRole(i.getRole())).toList())
+                                .registration(existEmail.getRegistration())
+                                .build())
+                        .build();
+            } else {
+                throw new UserException(ExceptionStatus.UNAUTHORIZED, "wrong password");
+            }
         }
     }
 
     @Override
     public Boolean existByEmail(String email) {
-        if (email.isEmpty()) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        }
         return userRepository.existsByEmail(email);
     }
 
@@ -159,7 +161,7 @@ public class UserServiceImpl implements UserService {
         if (existById(id)) {
             userRepository.deleteById(id);
         } else {
-            throw new UserException(ExceptionStatus.NOT_FOUND, "User not found");
+            throw new UserException(ExceptionStatus.NOT_FOUND, "id not found");
         }
     }
 
@@ -170,9 +172,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findById(Long id) {
-        if (id == null) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        }
         return userRepository.findById(id)
                 .map(this::entityToDto)
                 .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "User not found"));
@@ -180,92 +179,96 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByEmail(String email) {
-        if (email.isEmpty()) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        }
         return userRepository.findByEmail(email).map(this::entityToDto)
                 .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "User Email not found"));
     }
 
     @Override
     public Boolean existById(Long id) {
-        if (id == null) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        }
         return userRepository.existsById(id);
     }
 
     @Override
     @Transactional
     public Boolean modifyByPassword(String email, String oldPassword, String newPassword) {
-        if (existByEmail(email)) {
+        if (!email.isEmpty() && existByEmail(email)) {
             UserModel updateUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UserException(ExceptionStatus.NOT_FOUND, "User not found"));
             if (passwordEncoder.matches(oldPassword, updateUser.getPassword())) {
-                queryFactory.update(qUser)
+                long result = queryFactory.update(qUser)
                         .set(qUser.password, passwordEncoder.encode(newPassword))
                         .where(qUser.id.eq(updateUser.getId()))
                         .execute();
-                return Boolean.TRUE;
+                return result == 1 ? Boolean.TRUE : Boolean.FALSE;
             } else {
                 throw new UserException(ExceptionStatus.UNAUTHORIZED, "비밀번호가 다릅니다.");
             }
         } else {
-            throw new UserException(ExceptionStatus.NOT_FOUND, "Email이 존재하지 않습니다.");
+            throw new UserException(ExceptionStatus.NOT_FOUND, "Email 정보가 존재하지 않습니다.");
         }
     }
 
     @Override
     @Transactional
     public UserDto modifyByNameAndPhone(UserDto dto) {
-        if (dto == null) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        } else if (existById(dto.getId())) {
-            queryFactory.update(qUser)
+        if (dto.getId() != null && existById(dto.getId())) {
+            long result = queryFactory.update(qUser)
                     .set(qUser.name, dto.getName())
                     .set(qUser.phone, dto.getPhone())
                     .where(qUser.id.eq(dto.getId()))
                     .execute();
-            return findById(dto.getId());
+            if (result == 1) {
+                return findById(dto.getId());
+            } else {
+                throw new UserException(ExceptionStatus.BAD_REQUEST, "modify fail");
+            }
         } else {
             throw new UserException(ExceptionStatus.NOT_FOUND, "계정이 존재하지 않습니다.");
         }
     }
 
-
     @Override
     public Map<Long, List<String>> findByNameAndProfile(Map<String, List<Long>> ids) {
-        Map<Long, List<String>> userMap = new HashMap<>();
-        for (List<Long> list : ids.values()) {
-            for (Long id : list) {
-                UserDto user = findById(id);
-                userMap.put(user.getId(), List.of(user.getName(), user.getProfile() == null ? "" : user.getProfile()));
+        if (ids.values().isEmpty()) {
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is empty");
+        } else {
+            Map<Long, List<String>> userMap = new HashMap<>();
+            for (List<Long> list : ids.values()) {
+                for (Long id : list) {
+                    UserDto user = findById(id);
+                    userMap.put(user.getId(), List.of(user.getName(), user.getProfile() == null ? "" : user.getProfile()));
+                }
             }
+            return userMap;
         }
-        return userMap;
     }
 
 
     @Override
     @Transactional
     public UserDto modifyByKeyword(Long id, String keyword, String info) {
-
-        StringPath updateSet = switch (keyword) {
-            case "email" -> qUser.email;
-            case "profile" -> qUser.profile;
-            case "phone" -> qUser.phone;
-            case "name" -> qUser.name;
-            case "toeicLevel" -> qUser.toeicLevel;
-            default -> throw new UserException(ExceptionStatus.NOT_FOUND, "Keyword not found");
-        };
-        if (existById(id)) {
+        if (id == null || keyword.isEmpty() || info.isEmpty()){
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "id or keyword cannot be empty");
+        } else if (existById(id)) {
+            StringPath updateSet = switch (keyword) {
+                case "email" -> qUser.email;
+                case "profile" -> qUser.profile;
+                case "phone" -> qUser.phone;
+                case "name" -> qUser.name;
+                case "toeicLevel" -> qUser.toeicLevel;
+                default -> throw new UserException(ExceptionStatus.NOT_FOUND, "Keyword not found");
+            };
             var updateUser = findById(id);
-            queryFactory
+            long result = queryFactory
                     .update(qUser)
                     .set(updateSet, info)
                     .where(qUser.id.eq(updateUser.getId()))
                     .execute();
-            return findById(id);
+            if (result == 1) {
+                return findById(id);
+            } else {
+                throw new UserException(ExceptionStatus.BAD_REQUEST, "modify fail");
+            }
         } else {
             throw new UserException(ExceptionStatus.NOT_FOUND, "Email이 존재하지 않습니다.");
         }

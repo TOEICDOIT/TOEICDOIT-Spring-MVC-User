@@ -11,17 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import site.toeicdoit.user.domain.dto.BoardDto;
-import site.toeicdoit.user.domain.model.BoardModel;
 import site.toeicdoit.user.domain.model.QBoardModel;
-import site.toeicdoit.user.domain.vo.MessageStatus;
-import site.toeicdoit.user.domain.vo.Messenger;
-import site.toeicdoit.user.exception.ExceptionStatus;
+import site.toeicdoit.user.domain.vo.ExceptionStatus;
 import site.toeicdoit.user.exception.UserException;
 import site.toeicdoit.user.repository.BoardRepository;
 import site.toeicdoit.user.service.BoardService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -35,11 +31,11 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public BoardDto save(BoardDto dto) {
-        if (dto != null) {
+        if (!dto.getTitle().isEmpty() || !dto.getContent().isEmpty()) {
             Long id = boardRepository.save(dtoToEntity(dto)).getId();
             return findById(id);
         } else {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
+            throw new UserException(ExceptionStatus.INVALID_INPUT, "title, content 내용을 작성해주세요.");
         }
     }
 
@@ -65,24 +61,25 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Boolean existById(Long id) {
-        if (id == null) {
-            throw new UserException(ExceptionStatus.INVALID_INPUT, "param is null");
-        }
         return boardRepository.existsById(id);
     }
 
     @Override
     @Transactional
     public BoardDto modify(BoardDto dto) {
-        if(existById(dto.getId())){
-            queryFactory.update(qBoard)
+        if(dto.getId() != null && existById(dto.getId())){
+            long result = queryFactory.update(qBoard)
                     .set(qBoard.title, dto.getTitle())
                     .set(qBoard.content, dto.getContent())
                     .set(qBoard.type, dto.getType())
                     .set(qBoard.category, dto.getCategory())
                     .where(qBoard.id.eq(dto.getId()))
                     .execute();
-            return findById(dto.getId());
+            if (result == 1) {
+                return findById(dto.getId());
+            } else {
+                throw new UserException(ExceptionStatus.BAD_REQUEST, "board modify fail");
+            }
         } else {
             throw new UserException(ExceptionStatus.NOT_FOUND, "id not found");
         }
