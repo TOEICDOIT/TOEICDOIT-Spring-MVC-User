@@ -17,7 +17,8 @@ public class ToeicCategoryModel extends BaseModel {
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title; //기출제목
+    private String title;
+    private Boolean take;
     private String sound; //기출음성
     private String testType; //기출 유형
 
