@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import site.toeicdoit.user.domain.dto.UserDto;
+import site.toeicdoit.user.domain.vo.MessageStatus;
 import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.domain.vo.PageRequestVo;
 import site.toeicdoit.user.service.UserService;
@@ -74,6 +75,17 @@ public class UserController {
     @PostMapping("/find-by-name-profile")
     public ResponseEntity<Map<Long, List<String>>> findByNameAndProfile(@RequestBody Map<String, List<Long>> ids){
         return ResponseEntity.ok(service.findByNameAndProfile(ids));
+    }
+
+    @PutMapping("/modify-by/{id}/{keyword}")
+    public ResponseEntity<Messenger> modifyByKeyword(@PathVariable("id") Long id,
+                                                     @PathVariable("keyword") String keyword,
+                                                     @RequestParam("info") String info) {
+        return ResponseEntity.ok(Messenger.builder()
+                .message("user modifyByKeyword : "+ MessageStatus.SUCCESS.name())
+                .state(Boolean.TRUE)
+                .data(service.modifyByKeyword(id, keyword, info))
+                .build());
     }
 
 }

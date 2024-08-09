@@ -59,13 +59,13 @@ public class ReplyServiceImpl implements ReplyService {
     @Transactional
     public Messenger modify(ReplyDto replyDto) {
         if (replyDto != null && replyRepository.existsById(replyDto.getId())) {
-             Long modReply = queryFactory.update(qReply)
+             queryFactory.update(qReply)
                     .set(qReply.content, replyDto.getContent())
                     .where(qReply.id.eq(replyDto.getId()))
                     .execute();
             return Messenger.builder()
                     .message(MessageStatus.SUCCESS.name())
-                    .data(replyRepository.findById(modReply))
+                    .data(entityToDto(replyRepository.findById(replyDto.getId()).get()))
                     .build();
         } else if (!replyRepository.existsById(replyDto.getId())) {
             return Messenger.builder()

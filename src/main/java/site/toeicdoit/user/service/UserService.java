@@ -63,4 +63,5 @@ public interface UserService extends CommandService<UserDto>, QueryService<UserD
     Messenger modifyByNameAndPhone(UserDto dto);
 
     Map<Long, List<String>> findByNameAndProfile(Map<String, List<Long>> ids);
+    UserDto modifyByKeyword(Long id, String keyword, String info);
 }

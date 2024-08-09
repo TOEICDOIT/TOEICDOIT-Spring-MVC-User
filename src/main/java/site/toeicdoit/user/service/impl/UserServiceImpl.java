@@ -1,5 +1,6 @@
 package site.toeicdoit.user.service.impl;
 
+import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -182,7 +183,7 @@ public class UserServiceImpl implements UserService {
                     .message("입력된 정보가 없습니다.")
                     .build();
         } else if (existByEmail(dto.getEmail())) {
-            var updateUser = queryFactory.update(qUser)
+            queryFactory.update(qUser)
                     .set(qUser.name, dto.getName())
                     .set(qUser.email, dto.getEmail())
                     .set(qUser.profile, dto.getProfile())
@@ -190,7 +191,7 @@ public class UserServiceImpl implements UserService {
                     .execute();
             return Messenger.builder()
                     .message(MessageStatus.SUCCESS.name())
-                    .data(findById(updateUser))
+                    .data(userRepository.findById(dto.getId()).get())
                     .build();
         } else {
             return Messenger.builder()
@@ -202,19 +203,26 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Messenger modifyByPassword(String email, String oldPassword, String newPassword) {
-        if (userRepository.existsByEmail(email)) {
-            var updateUser = userRepository.findByEmail(email).get();
+        if (!email.isEmpty() && existByEmail(email)) {
+            UserModel updateUser = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new AlreadyExistElementException("User not found"));
             if (passwordEncoder.matches(oldPassword, updateUser.getPassword())) {
                 queryFactory.update(qUser)
                         .set(qUser.password, passwordEncoder.encode(newPassword))
                         .where(qUser.id.eq(updateUser.getId()))
                         .execute();
-                return Messenger.builder().message(MessageStatus.SUCCESS.name()).build();
+                return Messenger.builder()
+                        .message(MessageStatus.SUCCESS.name())
+                        .build();
             } else {
-                return Messenger.builder().message("이전 비밀번호와 다릅니다.").build();
+                return Messenger.builder()
+                        .message(MessageStatus.FAILURE.name())
+                        .build();
             }
         } else {
-            return Messenger.builder().message("Email 정보가 존재하지 않습니다.").build();
+            return Messenger.builder()
+                    .message(MessageStatus.FAILURE.name())
+                    .build();
         }
     }
 
@@ -226,7 +234,7 @@ public class UserServiceImpl implements UserService {
                     .message("입력된 정보가 없습니다.")
                     .build();
         } else if (existByEmail(dto.getEmail())) {
-            long user = queryFactory.update(qUser)
+            queryFactory.update(qUser)
                     .set(qUser.name, dto.getName())
                     .set(qUser.phone, dto.getPhone())
                     .where(qUser.id.eq(dto.getId()))
@@ -254,6 +262,37 @@ public class UserServiceImpl implements UserService {
             }
         }
         return userMap;
+
+    }
+
+    @Override
+    @Transactional
+    public UserDto modifyByKeyword(Long id, String keyword, String info) {
+        if (id == null || keyword.isEmpty() || info.isEmpty()){
+            throw new AlreadyExistElementException("Email 정보가 없습니다.");
+        } else if (existById(id)) {
+            StringPath updateSet = switch (keyword) {
+                case "email" -> qUser.email;
+                case "profile" -> qUser.profile;
+                case "phone" -> qUser.phone;
+                case "name" -> qUser.name;
+                case "toeicLevel" -> qUser.toeicLevel;
+                default -> throw new AlreadyExistElementException("Email 정보가 없습니다.");
+            };
+            var updateUser = findById(id).get();
+            long result = queryFactory
+                    .update(qUser)
+                    .set(updateSet, info)
+                    .where(qUser.id.eq(updateUser.getId()))
+                    .execute();
+            if (result == 1) {
+                return null;
+            } else {
+                throw new AlreadyExistElementException("Email 정보가 없습니다.");
+            }
+        } else {
+            throw new AlreadyExistElementException("Email 정보가 없습니다.");
+        }
     }
 
 }
