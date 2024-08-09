@@ -20,7 +20,7 @@ public class UserDto {
     private String name;
     private String profile;
     private String phone;
-    private Integer toeicLevel;
+    private String toeicLevel;
     private String registration;
     private List<Role> roles;
     private String oauthId;
