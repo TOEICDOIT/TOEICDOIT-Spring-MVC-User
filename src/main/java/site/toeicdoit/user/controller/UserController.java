@@ -71,7 +71,7 @@ public class UserController {
         return ResponseEntity.ok(service.modifyByNameAndPhone(dto));
     }
 
-    @GetMapping("/find-by-name-profile")
+    @PostMapping("/find-by-name-profile")
     public ResponseEntity<Map<Long, List<String>>> findByNameAndProfile(@RequestBody Map<String, List<Long>> ids){
         return ResponseEntity.ok(service.findByNameAndProfile(ids));
     }

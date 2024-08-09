@@ -233,7 +233,7 @@ public class UserServiceImpl implements UserService {
                     .execute();
             return Messenger.builder()
                     .message(MessageStatus.SUCCESS.name())
-                    .data(findById(user))
+                    .data(findById(dto.getId()))
                     .build();
         } else {
             return Messenger.builder()
