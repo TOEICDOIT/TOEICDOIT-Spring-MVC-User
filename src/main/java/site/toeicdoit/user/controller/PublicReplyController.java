@@ -9,7 +9,7 @@ import site.toeicdoit.user.domain.vo.Messenger;
 import site.toeicdoit.user.service.ReplyService;
 
 
-@RequestMapping(path = "/api/reply")
+@RequestMapping(path = "/api/public/reply")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 @RestController
