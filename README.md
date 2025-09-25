@@ -1,107 +1,84 @@
-TOEIC 학습 플랫폼: TOEICDOIT
-사용자의 실력 측정부터 맞춤형 학습 경로 추천, 실시간 소통까지 지원하는 MSA 기반의 종합 토익 학습 웹 서비스입니다.
+# TOEICDOIT - 효과적인 토익 학습 웹 서비스
 
-🗓️ 프로젝트 정보
-프로젝트 기간: 2024.07.03 ~ 2024.08.09 (총 42일)
+TOEICDOIT는 실력 측정 및 분석, 효율적인 학습, 실시간 채팅 커뮤니케이션을 통해 효과적인 TOEIC 학습을 지원하는 웹 서비스입니다.
 
-팀 구성: 총 5명 (백엔드 4명, 프론트엔드 1명)
+- **프로젝트 GitHub:** [TOEICDOIT Organization](https://github.com/orgs/TOEICDOIT/repositories)
+- **개인 기여 Repository:** [TOEICDOIT-Spring-MVC-User](https://github.com/TOEICDOIT/TOEICDOIT-Spring-MVC-User)
 
-GitHub Organization: TOEICDOIT Repositories
+---
 
-프로젝트 관리: Notion
+## 📅 프로젝트 개요
 
-✨ 핵심 기능
-기능
+* **기간:** 2024.07.03 ~ 2024.08.09 (총 42일)
+* **인원:** 총 5명 (프론트엔드 1명, 백엔드 4명)
 
-상세 내용
+---
 
-회원 관리
+## ✨ 핵심 기능
 
-로컬 회원가입 및 Google 소셜 로그인을 지원하며, 안전한 비밀번호 암호화(BCrypt) 및 JWT 기반 인증을 제공합니다.
+* **MSA 아키텍처 기반 서비스:** 확장성과 유지보수성을 고려한 마이크로서비스 아키텍처를 기반으로 서비스를 구축했습니다.
+* **소셜 로그인:** Google 소셜 로그인 기능을 구현하여 사용자의 접근성을 높였습니다.
+* **토익 모의고사 및 결과 분석:** 토익 모의고사 기능을 제공하며, 차트를 통해 학습 결과를 직관적으로 분석할 수 있습니다.
+* **구독 서비스:** 결제를 통해 서비스를 구독하고 모든 기능을 이용할 수 있습니다.
 
-모의고사 및 분석
+---
 
-사용자는 토익 모의고사를 응시할 수 있으며, Chart.js를 활용한 시각적 차트를 통해 성적 분석 결과를 확인할 수 있습니다.
+## 🛠️ 사용 기술
 
-커뮤니티
+| 구분 | 기술 스택 |
+| :--- | :--- |
+| **`Backend`** | `Java 17`, `Spring Boot`, `Spring Data JPA`, `Spring Cloud Gateway`, `Spring Netflix Eureka`, `QueryDSL`, `JPQL` |
+| **`Frontend`** | `Typescript`, `React`, `Next.js 14`, `Tailwind CSS`, `Zustand`, `Chart.js` |
+| **`Database & Messaging`** | `MySQL`, `H2`, `MongoDB`, `Redis`, `Apache Kafka` |
+| **`CI/CD & Deployment`** | `Docker`, `Jenkins`, `NCloud Kubernetes Service`, `NCloud Server` |
+| **`Tools & Communication`** | `IntelliJ IDEA`, `Swagger`, `Postman`, `Git`, `GitHub`, `Slack`, `Notion` |
 
-사용자들이 자유롭게 정보를 교환할 수 있는 게시판 및 댓글 기능을 제공합니다.
+---
 
-서비스 구독
+## 👨‍💻 개인 기여 (20%)
 
-결제 시스템을 연동하여 유료 구독 모델을 통해 프리미엄 학습 콘텐츠를 제공합니다.
+백엔드 개발자로서 **User, Board, Reply 서비스**의 개발을 담당했습니다.
 
-MSA 아키텍처
+### **1. API 및 핵심 로직 구현**
+* 유저, 게시판, 댓글 관련 **총 21개의 REST API를 설계하고 구현**했습니다.
+* 유저(회원가입, 로그아웃, 수정, 탈퇴) 및 게시판/댓글의 CRUD 내부 로직을 구현했습니다.
+* `User`, `Board`, `Reply`의 DTO와 Entity를 설계했습니다.
+* 회원가입 시 **BCrypt 암호화 알고리즘**을 사용하여 비밀번호를 안전하게 저장했습니다.
+* 회원 탈퇴 시 `CascadeType` 설정을 통해 연관된 게시글과 댓글 데이터가 함께 삭제되도록 하여 데이터 무결성을 유지했습니다.
 
-각 서비스(User, Toeic, Chat 등)를 독립적인 Microservice로 분리하여 개발 및 배포의 유연성과 확장성을 확보했습니다.
+### **2. 동적 쿼리 및 데이터베이스 최적화**
+* **QueryDSL**을 활용하여 카테고리, 작성자, 키워드 등 다양한 조건에 따른 게시판 동적 검색 필터링 로직을 작성했습니다.
+* `StringPath` 타입을 활용하여 특정 키워드에 따라 지정된 컬럼을 동적으로 업데이트하는 쿼리를 구현했습니다.
+* `Pageable`을 사용하여 조회된 데이터에 페이지네이션을 적용했습니다.
 
-CI/CD
+### **3. 코드 표준화 및 예외 처리**
+* **CQRS 패턴**을 활용하여 공통된 CRUD 기능을 인터페이스로 추상화하여 유지보수성과 재사용성을 높였습니다.
+* API의 반환 데이터를 커스텀한 `Messenger` 형식으로 통일하여 일관성을 확보했습니다.
+* **`@RestControllerAdvice`**를 사용하여 `UserException`과 같은 커스텀 예외를 처리하는 글로벌 예외 핸들러를 구현했습니다.
 
-Jenkins, Docker, NCloud를 활용하여 빌드, 테스트, 배포 과정을 자동화하여 안정적이고 효율적인 개발 환경을 구축했습니다.
+---
 
-🏛️ 시스템 아키텍처
-프로젝트 포트폴리오에 포함된 아키텍처 다이어그램 이미지입니다.
+## 🚀 프로젝트 관리 및 설계
 
-🛠️ 기술 스택
-구분
+### **ERD (Entity-Relation Diagram)**
+- 데이터베이스 모델링은 ERD Cloud를 사용하여 설계하고 팀원들과 실시간으로 공유했습니다.
+- **[ERD Cloud 바로가기](https://www.erdcloud.com/d/D2eGzvEpMJhtfJhfE)**
 
-기술
+### **일정 관리**
+- **Scrum:** 일주일 단위의 스프린트를 적용하고, 칸반 보드를 통해 프로젝트 진행 상황(진행 전, 진행 중, 완료 등)을 시각화하여 관리했습니다.
+- **Notion:** 프로젝트 관련 모든 문서(일정, API 규칙, 자료 공유 등)를 체계적으로 관리하기 위해 Notion을 적극적으로 활용했습니다.
+- **[프로젝트 Notion 바로가기](https://6whistle.notion.site/TOEICDOIT-Project-8b0c5b625a4e49918c42f1dee097b446?pvs=4)**
 
-Back-End
+---
 
-Java 17, Spring Boot, Spring Webflux, Spring Data JPA, QueryDSL, Spring Security, JWT, OAuth 2.0
+## 🏛️ 시스템 아키텍처
 
-Front-End
+![TOEICDOIT 프로젝트 아키텍처 다이어그램](https://raw.githubusercontent.com/seunghochoi9/resume/f64c7bd6421280a122676592eb4310752d3affd4/project%20daieogeulaem.png)
 
-TypeScript, React, Next.js 14, Zustand, React-Query, Tailwind CSS, Chart.js
+---
 
-Database
+## 🎥 프로젝트 시연 영상
 
-MySQL 8.0, MongoDB, Redis, H2
-
-MSA & Infra
-
-Spring Cloud Gateway, Netflix Eureka, Apache Kafka
-
-CI/CD & DevOps
-
-Docker, Jenkins, NCloud Kubernetes Service (NKS), NCloud Load Balancer, NCloud Object Storage
-
-Tools
-
-IntelliJ IDEA, Git, GitHub, Postman, Swagger, Slack, Notion
-
-👨‍💻 저의 주요 역할 및 기여
-저는 이번 프로젝트에서 User, Board, Reply 서비스의 백엔드 시스템 설계 및 개발을 담당했습니다. (개인 기여도 20%)
-
-1. 핵심 비즈니스 로직 및 API 개발 (총 21개 REST API 구현)
-
-User Service:
-
-회원가입, 로그아웃, 정보 수정, 회원 탈퇴 등 사용자 계정 관리의 핵심 로직을 구현했습니다.
-
-BCrypt를 사용해 비밀번호를 안전하게 암호화하고, 민감 정보를 제외한 DTO를 설계하여 보안을 강화했습니다.
-
-Board & Reply Service:
-
-게시글 및 댓글의 CRUD(Create, Read, Update, Delete) 기능을 구현했습니다.
-
-QueryDSL을 활용한 동적 쿼리를 작성하여 카테고리, 작성자, 키워드 등 다양한 조건의 검색 및 필터링 기능을 구현하고, 페이징 처리를 적용했습니다.
-
-부모-자식 엔티티 간의 연관관계를 명확히 설정하여 데이터 정합성을 유지했습니다.
-
-2. 안정적인 백엔드 시스템 설계
-
-공통 기능 모듈화: 여러 서비스에서 반복적으로 사용되는 CRUD 로직을 CQRS 패턴 기반의 인터페이스로 추상화하고, 커스텀 응답 포맷(Messenger)을 통일하여 코드 재사용성과 유지보수성을 높였습니다.
-
-글로벌 예외 처리: @RestControllerAdvice를 사용하여 비즈니스 로직에서 발생하는 예외를 일관되게 처리하고, 명확한 상태 코드와 메시지를 클라이언트에 전달하도록 설계했습니다.
-
-DTO 및 Entity 설계: 클라이언트와의 데이터 교환 및 데이터베이스 영속성을 고려하여 User, Board, Reply 관련 DTO와 Entity를 설계했습니다.
-
-3. MSA 환경에서의 인증/인가 구조 기여
-
-Spring Cloud Gateway에서 JWT 토큰 검증 및 Spring Security 인증/인가 로직을 통합 처리하도록 설계에 기여했습니다.
-
-이를 통해 각 개별 서비스(User, Board 등)는 인증 로직의 부담을 덜고 핵심 비즈니스 로직에만 집중할 수 있는 구조를 마련했습니다.
-
-이 README는 제공된 'TOEICDOIT_프로젝트 포토폴리오.pdf' 문서를 기반으로 작성되었습니다.
+* **최종 발표 영상:** [시청하기](https://www.youtube.com/live/JMVk6B-iCn4?si=jFd5NMhS20ytcQho)
+* **프로젝트 결과물 시연 영상:** [시청하기](https://youtu.be/eEsG4DDDx54)
+* **개인 프로토타입 시연 영상:** [시청하기](https://youtu.be/reSqeeXBx6o?si=DU0wP9qAvUBj9MFs)
