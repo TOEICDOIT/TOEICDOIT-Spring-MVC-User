@@ -1,84 +1,53 @@
-# TOEICDOIT - 효과적인 토익 학습 웹 서비스
-
-TOEICDOIT는 실력 측정 및 분석, 효율적인 학습, 실시간 채팅 커뮤니케이션을 통해 효과적인 TOEIC 학습을 지원하는 웹 서비스입니다.
-
-- **프로젝트 GitHub:** [TOEICDOIT Organization](https://github.com/orgs/TOEICDOIT/repositories)
-- **개인 기여 Repository:** [TOEICDOIT-Spring-MVC-User](https://github.com/TOEICDOIT/TOEICDOIT-Spring-MVC-User)
+# TOEIC 학습 플랫폼: TOEICDOIT
+사용자의 실력 측정부터 맞춤형 학습 경로 추천, 실시간 소통까지 지원하는 MSA 기반의 종합 토익 학습 웹 서비스입니다.
 
 ---
 
-## 📅 프로젝트 개요
-
-* **기간:** 2024.07.03 ~ 2024.08.09 (총 42일)
-* **인원:** 총 5명 (프론트엔드 1명, 백엔드 4명)
-
----
-
-## ✨ 핵심 기능
-
-* **MSA 아키텍처 기반 서비스:** 확장성과 유지보수성을 고려한 마이크로서비스 아키텍처를 기반으로 서비스를 구축했습니다.
-* **소셜 로그인:** Google 소셜 로그인 기능을 구현하여 사용자의 접근성을 높였습니다.
-* **토익 모의고사 및 결과 분석:** 토익 모의고사 기능을 제공하며, 차트를 통해 학습 결과를 직관적으로 분석할 수 있습니다.
-* **구독 서비스:** 결제를 통해 서비스를 구독하고 모든 기능을 이용할 수 있습니다.
+### 🗓️ 프로젝트 정보
+* **프로젝트 기간:** 2024.07.03 ~ 2024.08.09 (총 42일)
+* **팀 구성:** 총 5명 (백엔드 4명, 프론트엔드 1명)
+* **GitHub Organization:** [TOEICDOIT Repositories](https://github.com/orgs/TOEICDOIT/repositories)
 
 ---
 
-## 🛠️ 사용 기술
-
-| 구분 | 기술 스택 |
+### ✨ 핵심 기능
+| 기능 | 상세 내용 |
 | :--- | :--- |
-| **`Backend`** | `Java 17`, `Spring Boot`, `Spring Data JPA`, `Spring Cloud Gateway`, `Spring Netflix Eureka`, `QueryDSL`, `JPQL` |
-| **`Frontend`** | `Typescript`, `React`, `Next.js 14`, `Tailwind CSS`, `Zustand`, `Chart.js` |
-| **`Database & Messaging`** | `MySQL`, `H2`, `MongoDB`, `Redis`, `Apache Kafka` |
-| **`CI/CD & Deployment`** | `Docker`, `Jenkins`, `NCloud Kubernetes Service`, `NCloud Server` |
-| **`Tools & Communication`** | `IntelliJ IDEA`, `Swagger`, `Postman`, `Git`, `GitHub`, `Slack`, `Notion` |
+| **회원 관리** | 로컬 회원가입 및 Google 소셜 로그인을 지원하며, 안전한 비밀번호 암호화(BCrypt) 및 JWT 기반 인증을 제공합니다. |
+| **모의고사 및 분석** | 사용자는 토익 모의고사를 응시할 수 있으며, Chart.js를 활용한 시각적 차트를 통해 성적 분석 결과를 확인할 수 있습니다. |
+| **커뮤니티** | 사용자들이 자유롭게 정보를 교환할 수 있는 게시판 및 댓글 기능을 제공합니다. |
+| **서비스 구독** | 결제 시스템을 연동하여 유료 구독 모델을 통해 프리미엄 학습 콘텐츠를 제공합니다. |
+| **MSA 아키텍처** | 각 서비스(User, Toeic, Chat 등)를 독립적인 Microservice로 분리하여 개발 및 배포의 유연성과 확장성을 확보했습니다. |
+| **CI/CD** | Jenkins, Docker, NCloud를 활용하여 빌드, 테스트, 배포 과정을 자동화하여 안정적이고 효율적인 개발 환경을 구축했습니다. |
 
 ---
 
-## 👨‍💻 개인 기여 (20%)
-
-백엔드 개발자로서 **User, Board, Reply 서비스**의 개발을 담당했습니다.
-
-### **1. API 및 핵심 로직 구현**
-* 유저, 게시판, 댓글 관련 **총 21개의 REST API를 설계하고 구현**했습니다.
-* 유저(회원가입, 로그아웃, 수정, 탈퇴) 및 게시판/댓글의 CRUD 내부 로직을 구현했습니다.
-* `User`, `Board`, `Reply`의 DTO와 Entity를 설계했습니다.
-* 회원가입 시 **BCrypt 암호화 알고리즘**을 사용하여 비밀번호를 안전하게 저장했습니다.
-* 회원 탈퇴 시 `CascadeType` 설정을 통해 연관된 게시글과 댓글 데이터가 함께 삭제되도록 하여 데이터 무결성을 유지했습니다.
-
-### **2. 동적 쿼리 및 데이터베이스 최적화**
-* **QueryDSL**을 활용하여 카테고리, 작성자, 키워드 등 다양한 조건에 따른 게시판 동적 검색 필터링 로직을 작성했습니다.
-* `StringPath` 타입을 활용하여 특정 키워드에 따라 지정된 컬럼을 동적으로 업데이트하는 쿼리를 구현했습니다.
-* `Pageable`을 사용하여 조회된 데이터에 페이지네이션을 적용했습니다.
-
-### **3. 코드 표준화 및 예외 처리**
-* **CQRS 패턴**을 활용하여 공통된 CRUD 기능을 인터페이스로 추상화하여 유지보수성과 재사용성을 높였습니다.
-* API의 반환 데이터를 커스텀한 `Messenger` 형식으로 통일하여 일관성을 확보했습니다.
-* **`@RestControllerAdvice`**를 사용하여 `UserException`과 같은 커스텀 예외를 처리하는 글로벌 예외 핸들러를 구현했습니다.
+### 🚀 프로젝트 관리 및 기획
+* **요구사항 분석 및 기능 명세:** Notion을 활용하여 팀원들과 함께 API 명세, DB 스키마(ERD) 등 프로젝트 요구사항을 정의하고 구체화했습니다.
+* **애자일 방법론 적용:** Scrum과 Kanban 보드를 활용하여 일주일 단위의 스프린트로 업무를 계획하고, 매일 진행 상황을 공유하며 이슈에 신속하게 대응했습니다.
+* **일정 및 리스크 관리:** 프로젝트 전체 일정을 계획하고 각 기능별 개발 우선순위를 정하며, 잠재적 리스크를 사전에 파악하고 해결 방안을 논의했습니다.
 
 ---
 
-## 🚀 프로젝트 관리 및 설계
+### 👨‍💻 주요 역할 및 기여
+저는 이번 프로젝트에서 User, Board, Reply 서비스의 백엔드 시스템 설계 및 개발을 담당했습니다. **(개인 기여도 20%)**
 
-### **ERD (Entity-Relation Diagram)**
-- 데이터베이스 모델링은 ERD Cloud를 사용하여 설계하고 팀원들과 실시간으로 공유했습니다.
-- **[ERD Cloud 바로가기](https://www.erdcloud.com/d/D2eGzvEpMJhtfJhfE)**
+1.  **사용자 중심 기능 기획 및 구현**
+    * **사용자 인증 시스템 설계:** 사용자 계정 관리의 핵심 로직을 설계하며, `BCrypt` 암호화와 `DTO` 설계를 통해 **사용자 개인정보 보호 정책**을 수립하고 보안을 강화했습니다.
+    * **커뮤니티 검색 기능 고도화:** `QueryDSL`을 활용하여 **다양한 사용자 요구사항(카테고리, 키워드 등)에 대응**할 수 있는 유연한 검색 및 필터링 기능을 기획하고 구현했습니다.
 
-### **일정 관리**
-- **Scrum:** 일주일 단위의 스프린트를 적용하고, 칸반 보드를 통해 프로젝트 진행 상황(진행 전, 진행 중, 완료 등)을 시각화하여 관리했습니다.
-- **Notion:** 프로젝트 관련 모든 문서(일정, API 규칙, 자료 공유 등)를 체계적으로 관리하기 위해 Notion을 적극적으로 활용했습니다.
-- **[프로젝트 Notion 바로가기](https://6whistle.notion.site/TOEICDOIT-Project-8b0c5b625a4e49918c42f1dee097b446?pvs=4)**
-
----
-
-## 🏛️ 시스템 아키텍처
-
-![TOEICDOIT 프로젝트 아키텍처 다이어그램](https://raw.githubusercontent.com/seunghochoi9/resume/f64c7bd6421280a122676592eb4310752d3affd4/project%20daieogeulaem.png)
+2.  **안정적이고 확장 가능한 시스템 설계**
+    * **개발 생산성 향상:** 반복되는 CRUD 로직을 `CQRS 패턴` 기반으로 모듈화하여 코드 재사용성을 높이고, 팀원들의 **개발 생산성을 향상**시키는 데 기여했습니다.
+    * **안정적인 서비스 운영 설계:** `글로벌 예외 처리`를 도입하여 **예상치 못한 오류 발생 시 서비스가 중단되지 않고** 안정적으로 운영될 수 있는 기반을 마련했습니다.
 
 ---
 
-## 🎥 프로젝트 시연 영상
-
-* **최종 발표 영상:** [시청하기](https://www.youtube.com/live/JMVk6B-iCn4?si=jFd5NMhS20ytcQho)
-* **프로젝트 결과물 시연 영상:** [시청하기](https://youtu.be/eEsG4DDDx54)
-* **개인 프로토타입 시연 영상:** [시청하기](https://youtu.be/reSqeeXBx6o?si=DU0wP9qAvUBj9MFs)
+### 🛠️ 기술 스택
+| 구분 | 기술 |
+| :--- | :--- |
+| **Back-End** | Java 17, Spring Boot, Spring Webflux, Spring Data JPA, QueryDSL, Spring Security, JWT, OAuth 2.0 |
+| **Front-End** | TypeScript, React, Next.js 14, Zustand, React-Query, Tailwind CSS, Chart.js |
+| **Database** | MySQL 8.0, MongoDB, Redis, H2 |
+| **MSA & Infra** | Spring Cloud Gateway, Netflix Eureka, Apache Kafka |
+| **CI/CD & DevOps**| Docker, Jenkins, NCloud Kubernetes Service (NKS), NCloud Load Balancer, NCloud Object Storage |
+| **Tools** | IntelliJ IDEA, Git, GitHub, Postman, Swagger, Slack, **Notion** |
